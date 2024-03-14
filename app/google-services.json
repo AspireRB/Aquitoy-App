@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "237440083921",
+    "project_id": "aquitoy-f5e63",
+    "storage_bucket": "aquitoy-f5e63.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:237440083921:android:2294b09e6806456a94e2f0",
+        "android_client_info": {
+          "package_name": "com.aspire.aquitoy"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDnMQResT334y4mfL0EJX3DBVGvT2t7CnA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:237440083921:android:0ddaaaa7137df0b094e2f0",
+        "android_client_info": {
+          "package_name": "com.aspire.aquitoy.debug"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDnMQResT334y4mfL0EJX3DBVGvT2t7CnA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
