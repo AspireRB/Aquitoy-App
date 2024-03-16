@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardGoogle"
+        android:layout_width="250dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="16dp"
+        app:cardBackgroundColor="@color/MainlyBlue"
+        app:cardCornerRadius="10dp"
+        app:layout_constraintBottom_toTopOf="@+id/viewDivider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="59dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|center"
+            android:src="@drawable/ic_google" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/login_google"
+            android:textColor="@color/background"
+            tools:layout_editor_absoluteX="231dp"
+            tools:layout_editor_absoluteY="16dp" />
+
+    </androidx.cardview.widget.CardView>
+
+    <View
+        android:id="@+id/viewDivider"
+        android:layout_width="0dp"
+        android:layout_height="0.5dp"
+        android:layout_marginBottom="16dp"
+        android:background="@color/foreground"
+        app:layout_constraintBottom_toTopOf="@+id/tvFooter"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvFooter"
+        style="@style/CaptionText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="40dp"
+        android:text="@string/login_sign_in"
+        android:textColor="@color/gray"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -40,6 +40,9 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 dependencies {
@@ -48,11 +51,29 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:32.7.4"))
     implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-auth-ktx")
-
     //Hilt
-    implementation("com.google.dagger:hilt-android:2.44")
-    kapt("com.google.dagger:hilt-android-compiler:2.44")
-
+    implementation("com.google.dagger:hilt-android:2.51")
+    kapt("com.google.dagger:hilt-android-compiler:2.51")
+    //Activity
+    implementation("androidx.activity:activity-ktx:1.8.2")
+    // Fragment
+    implementation ("androidx.fragment:fragment-ktx:1.6.2")
+    // ViewModel
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
+    // LiveData
+    implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+    //Corrutinas
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.0")
+    //Splash
+    implementation ("androidx.core:core-splashscreen:1.0.1")
+    //Timber
+    implementation ("com.jakewharton.timber:timber:5.0.1")
+    //Lottie
+    implementation ("com.airbnb.android:lottie:6.4.0")
+    //Default
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
@@ -62,7 +83,7 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 }
 
-// Allow references to generated code
+//Allow references to generated code
 kapt {
     correctErrorTypes = true
 }
