@@ -13,14 +13,13 @@
         android:supportsRtl="true"
         android:theme="@style/Base.Theme.Aquitoy"
         tools:targetApi="31">
-        <activity
-            android:name=".ui.signin.SignInActivity"/>
-        <activity
-            android:name=".ui.login.LoginActivity"/>
+        <activity android:name=".ui.FragmentsActivity" />
+        <activity android:name=".ui.signin.SignInActivity" />
+        <activity android:name=".ui.login.LoginActivity" />
         <activity
             android:name=".ui.introduction.IntroductionActivity"
-            android:theme="@style/Theme.App.Starting"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/Theme.App.Starting">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -33,6 +33,21 @@
         <item name="android:fontFamily">@font/montserrat</item>
     </style>
 
+    <style name="BodyText" parent="Widget.AppCompat.TextView">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/gray</item>
+        <item name="android:gravity">center</item>
+        <item name="android:fontFamily">@font/montserrat</item>
+    </style>
+
+    <style name="TitleText" parent="Widget.AppCompat.TextView">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/gray</item>
+        <item name="android:gravity">center</item>
+        <item name="android:fontFamily">@font/montserrat</item>
+    </style>
+
     <style name="PrimaryButton" parent="Widget.MaterialComponents.Button">
         <item name="android:textSize">12sp</item>
         <item name="textAllCaps">true</item>
@@ -86,4 +101,5 @@
         <item name="errorTextColor">@color/error</item>
         <item name="hintTextColor">@color/foreground</item>
     </style>
+
 </resources>

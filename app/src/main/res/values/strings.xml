@@ -1,5 +1,28 @@
 <resources>
     <string name="app_name">Aquitoy</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="menu_home">Home</string>
+    <string name="menu_messages">Messages</string>
+    <string name="menu_requests">Requests</string>
+    <string name="menu_profile">Profile</string>
+    <string name="menu_settings">Settings</string>
+
+    <string name="lorem_ipsum_title">Lorem Ipsum"</string>
+    <string name="lorem_ipsum">Lorem Ipsum is simply placeholder text of the printing and
+        typesetting industry. Lorem Ipsum has been the industry\'s standard placeholder text ever
+        since the 1500s, when an unknown printer took a galley of type and scrambled it to make a
+        type specimen book"
+    </string>
+    <string name="fab_content_description">Represents a view to invoke an action</string>
+    <string name="image_view_item_transform_content_description">Represents an image view in the
+        item
+    </string>
 
     <string name="login_subtitle"><![CDATA[Selecciona el tipo de sesión]]></string>
     <string name="login_sign_in">¿Todavía no tienes cuenta? Regístrate</string>
@@ -15,6 +38,7 @@
     <string name="login_error_dialog_negative_action">Cancelar</string>
     <string name="login_error_dialog_positive_action">Reintentar</string>
     <string name="login_google">Iniciar con Google</string>
+    <string name="login_forgot_password">¿Olvido la contraseña?</string>
 
     <string name="introduction_button_patient">Paciente</string>
     <string name="introduction_button_nurse">Enfermero</string>

@@ -1,5 +1,6 @@
 package com.aspire.aquitoy.ui.introduction
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -26,40 +27,50 @@ class IntroductionActivity : AppCompatActivity() {
         //startActivity(intent)
         //finish()
 
-        initUI()
-    }
+//        initUI()
+        val buttonPatient = binding.btnLoginPatient
+        val buttonNurse = binding.btnLoginNurse
 
-    private fun initUI() {
-        initListeners()
-        initObservers()
-    }
+        buttonPatient.setOnClickListener {
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+        }
 
-    private fun initListeners() {
-        with(binding) {
-            btnLoginPatient.setOnClickListener { introductionViewModel.onLoginPatientSelected() }
-            btnLoginNurse.setOnClickListener { introductionViewModel.onLoginNurseSelected() }
+        buttonNurse.setOnClickListener {
+            val intent = Intent(this, SignInActivity::class.java)
         }
     }
 
-
-    private fun initObservers() {
-        introductionViewModel.navigateToLoginPatient.observe(this, Observer {
-            it.getContentIfNotHandled()?.let {
-                goToLoginPatient()
-            }
-        })
-        introductionViewModel.navigateToLoginNurse.observe(this, Observer {
-            it.getContentIfNotHandled()?.let {
-                goToLoginNurse()
-            }
-        })
-    }
-
-    private fun goToLoginPatient() {
-        startActivity(LoginActivity.create(this))
-    }
-
-    private fun goToLoginNurse() {
-        startActivity(LoginActivity.create(this))
-    }
+//    private fun initUI() {
+//        initListeners()
+//        initObservers()
+//    }
+//
+//    private fun initListeners() {
+//        with(binding) {
+//            btnLoginPatient.setOnClickListener { introductionViewModel.onLoginPatientSelected() }
+//            btnLoginNurse.setOnClickListener { introductionViewModel.onLoginNurseSelected() }
+//        }
+//    }
+//
+//    private fun initObservers() {
+//        introductionViewModel.navigateToLoginPatient.observe(this, Observer {
+//            it.getContentIfNotHandled()?.let {
+//                goToLoginPatient()
+//            }
+//        })
+//        introductionViewModel.navigateToLoginNurse.observe(this, Observer {
+//            it.getContentIfNotHandled()?.let {
+//                goToLoginNurse()
+//            }
+//        })
+//    }
+//
+//    private fun goToLoginPatient() {
+//        startActivity(Intent(this, LoginActivity::class.java))
+//    }
+//
+//    private fun goToLoginNurse() {
+//        startActivity(Intent(this,SignInActivity::class.java))
+//    }
 }

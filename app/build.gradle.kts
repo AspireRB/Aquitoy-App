@@ -2,7 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
-    kotlin("kapt")
+    id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
 }
 
@@ -43,21 +43,26 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    kotlin {
+        jvmToolchain(8)
+    }
 }
 
 dependencies {
-
     //Firebase
     implementation(platform("com.google.firebase:firebase-bom:32.7.4"))
     implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-auth-ktx")
     //Hilt
     implementation("com.google.dagger:hilt-android:2.51")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
+    implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
     kapt("com.google.dagger:hilt-android-compiler:2.51")
     //Activity
     implementation("androidx.activity:activity-ktx:1.8.2")
     // Fragment
-    implementation ("androidx.fragment:fragment-ktx:1.6.2")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
+    implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
     // ViewModel
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
     // LiveData
@@ -83,7 +88,7 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 }
 
-//Allow references to generated code
 kapt {
     correctErrorTypes = true
+    useBuildCache = false
 }

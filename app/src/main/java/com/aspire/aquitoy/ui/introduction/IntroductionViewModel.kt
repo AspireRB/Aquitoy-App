@@ -9,19 +9,19 @@ import javax.inject.Inject
 
 @HiltViewModel
 class IntroductionViewModel @Inject constructor(): ViewModel() {
-    private val _navigateToLoginPatient = MutableLiveData<Event<Boolean>>()
-    val navigateToLoginPatient: LiveData<Event<Boolean>>
-        get() = _navigateToLoginPatient
-
-    private val _navigateToLoginNurse = MutableLiveData<Event<Boolean>>()
-    val navigateToLoginNurse: LiveData<Event<Boolean>>
-        get() = _navigateToLoginNurse
-
-    fun onLoginPatientSelected() {
-        _navigateToLoginPatient.value = Event(true)
-    }
-
-    fun onLoginNurseSelected() {
-        _navigateToLoginNurse.value = Event(true)
-    }
+//    private val _navigateToLoginPatient = MutableLiveData<Event<Boolean>>()
+//    val navigateToLoginPatient: LiveData<Event<Boolean>>
+//        get() = _navigateToLoginPatient
+//
+//    private val _navigateToLoginNurse = MutableLiveData<Event<Boolean>>()
+//    val navigateToLoginNurse: LiveData<Event<Boolean>>
+//        get() = _navigateToLoginNurse
+//
+//    fun onLoginPatientSelected() {
+//        _navigateToLoginPatient.value = Event(true)
+//    }
+//
+//    fun onLoginNurseSelected() {
+//        _navigateToLoginNurse.value = Event(true)
+//    }
 }
