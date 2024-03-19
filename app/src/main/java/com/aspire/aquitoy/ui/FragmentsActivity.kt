@@ -24,7 +24,7 @@ class FragmentsActivity : AppCompatActivity() {
 
         val appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.nav_home, R.id.nav_messages, R.id.nav_requests, R.id.nav_profile, R.id.nav_settings
+                R.id.nav_home, R.id.nav_messages, R.id.nav_requests, R.id.nav_profile
             )
         )
         setSupportActionBar(binding.toolbar)
