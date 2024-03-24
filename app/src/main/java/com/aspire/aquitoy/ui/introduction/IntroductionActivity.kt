@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Observer
 import com.aspire.aquitoy.databinding.ActivityIntroductionBinding
+import com.aspire.aquitoy.ui.FragmentsActivity
 import com.aspire.aquitoy.ui.login.LoginActivity
 import com.aspire.aquitoy.ui.signin.SignInActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -24,21 +25,33 @@ class IntroductionActivity : AppCompatActivity() {
 
         Thread.sleep(1000)
         splashScreen.setKeepOnScreenCondition { false }
-        //startActivity(intent)
-        //finish()
-
+//        startActivity(intent)
+//        finish()
+//
 //        initUI()
+        when(introductionViewModel.checkDestination()) {
+            IntruductionDestination.Home -> navigateToHome()
+            IntruductionDestination.Login -> navigateToLogin()
+        }
+
         val buttonPatient = binding.btnLoginPatient
         val buttonNurse = binding.btnLoginNurse
 
         buttonPatient.setOnClickListener {
-            val intent = Intent(this, LoginActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, LoginActivity::class.java))
         }
 
         buttonNurse.setOnClickListener {
-            val intent = Intent(this, SignInActivity::class.java)
+            startActivity(Intent(this, SignInActivity::class.java))
         }
+    }
+
+    private fun navigateToLogin(){
+        startActivity(Intent(this, LoginActivity::class.java))
+    }
+
+    private fun navigateToHome(){
+        startActivity(Intent(this, FragmentsActivity::class.java))
     }
 
 //    private fun initUI() {

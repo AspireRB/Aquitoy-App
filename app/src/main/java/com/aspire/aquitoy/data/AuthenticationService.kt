@@ -25,4 +25,10 @@ class AuthenticationService @Inject constructor(private val firebaseAuth: Fireba
                 }
         }
     }
+
+    fun isUserLogged(): Boolean {
+        return getCurrentuser() != null
+    }
+
+    private fun getCurrentuser() = firebaseAuth.currentUser
 }
