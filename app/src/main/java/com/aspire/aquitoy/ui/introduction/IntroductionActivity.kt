@@ -31,7 +31,7 @@ class IntroductionActivity : AppCompatActivity() {
 //        initUI()
         when(introductionViewModel.checkDestination()) {
             IntruductionDestination.Home -> navigateToHome()
-            IntruductionDestination.Login -> navigateToLogin()
+            IntruductionDestination.Nothing -> navigateToNothing()
         }
 
         val buttonPatient = binding.btnLoginPatient
@@ -46,9 +46,7 @@ class IntroductionActivity : AppCompatActivity() {
         }
     }
 
-    private fun navigateToLogin(){
-        startActivity(Intent(this, LoginActivity::class.java))
-    }
+    private fun navigateToNothing(){ }
 
     private fun navigateToHome(){
         startActivity(Intent(this, FragmentsActivity::class.java))

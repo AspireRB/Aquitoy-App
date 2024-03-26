@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aspire.aquitoy.data.AuthenticationService
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,6 +38,22 @@ class SignInViewModel @Inject constructor(private val authenticationService: Aut
             }
 
             _isLoading.value = false
+        }
+    }
+
+    fun onGoogleLoginSelected(googleLauncherLogin: (GoogleSignInClient) -> Unit) {
+        val gsc = authenticationService.getGoogleClient()
+        googleLauncherLogin(gsc)
+    }
+
+    fun signInWithGoogle(idToken: String, navigateToFragment: () -> Unit) {
+        viewModelScope.launch {
+            val result = withContext(Dispatchers.IO) {
+                authenticationService.loginWithGoogle(idToken)
+            }
+            if (result != null) {
+                navigateToFragment()
+            }
         }
     }
 }

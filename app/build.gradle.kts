@@ -53,6 +53,7 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:32.7.4"))
     implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.android.gms:play-services-auth:21.0.0")
     //Hilt
     implementation("com.google.dagger:hilt-android:2.51")
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")

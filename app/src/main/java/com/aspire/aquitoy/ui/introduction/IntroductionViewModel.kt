@@ -19,7 +19,7 @@ class IntroductionViewModel @Inject constructor(private val authenticationServic
         return if (isUserLogged) {
             IntruductionDestination.Home
         } else {
-            IntruductionDestination.Login
+            IntruductionDestination.Nothing
         }
     }
 //    private val _navigateToLoginPatient = MutableLiveData<Event<Boolean>>()
@@ -40,6 +40,6 @@ class IntroductionViewModel @Inject constructor(private val authenticationServic
 }
 
 sealed class IntruductionDestination {
-    object Login:IntruductionDestination()
+    object Nothing:IntruductionDestination()
     object Home:IntruductionDestination()
 }
