@@ -3,10 +3,26 @@ package com.aspire.aquitoy.ui.profile
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.aspire.aquitoy.data.AuthenticationService
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ProfileViewModel : ViewModel() {
+@HiltViewModel
+class ProfileViewModel @Inject constructor(private val authenticationService:
+                                           AuthenticationService): ViewModel() {
     private val _text = MutableLiveData<String>().apply {
         value = "This is profile Fragment"
     }
     val text: LiveData<String> = _text
+
+    fun logout(navigateToIntroduction: () -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            authenticationService.logout()
+        }
+        navigateToIntroduction()
+    }
+
 }

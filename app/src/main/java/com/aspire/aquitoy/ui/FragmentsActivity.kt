@@ -9,7 +9,9 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.aspire.aquitoy.databinding.ActivityFragmentsBinding
 import com.aspire.aquitoy.R
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class FragmentsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityFragmentsBinding
