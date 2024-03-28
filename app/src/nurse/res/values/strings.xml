@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Aquitoy</string>
+    <string name="app_name">Aquitoy Nurse</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Android Studio</string>
@@ -24,7 +24,7 @@
         item
     </string>
 
-    <string name="login_subtitle"><![CDATA[Selecciona el tipo de sesión]]></string>
+    <string name="login_subtitle"><![CDATA[Bienvenido Enfermero a la app Aquitoy]]></string>
     <string name="login_sign_in">¿Todavía no tienes cuenta? Regístrate</string>
     <string name="login_button_loggin">Iniciar Sesión</string>
     <string name="login_hint_password">Contraseña</string>
@@ -40,7 +40,7 @@
     <string name="login_google">Iniciar con Google</string>
     <string name="login_forgot_password">¿Olvido la contraseña?</string>
 
-    <string name="introduction_button_signin">Crear cuenta</string>
+    <string name="introduction_button">Empezemos</string>
 
     <string name="signin_form_real_name">Nombre completo</string>
     <string name="signin_form_nickname">Nombre público de usuario</string>

@@ -30,7 +30,7 @@ class AuthenticationService @Inject constructor(private val firebaseAuth: Fireba
                     cancellableContinuation.resume(user)
                 }
                 .addOnFailureListener {
-                  cancellableContinuation.resumeWithException(it)
+                    cancellableContinuation.resumeWithException(it)
                 }
         }
     }

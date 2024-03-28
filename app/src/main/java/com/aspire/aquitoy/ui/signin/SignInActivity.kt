@@ -21,10 +21,6 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class SignInActivity : AppCompatActivity() {
-//    companion object {
-//        fun create(context: Context): Intent =
-//            Intent(context, SignInActivity::class.java)
-//    }
 
     private lateinit var binding: ActivitySignInBinding
     private val signInViewModel:SignInViewModel by viewModels()

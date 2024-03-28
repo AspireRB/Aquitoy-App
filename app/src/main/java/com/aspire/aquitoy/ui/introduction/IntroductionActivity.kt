@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.lifecycle.Observer
 import com.aspire.aquitoy.databinding.ActivityIntroductionBinding
 import com.aspire.aquitoy.ui.FragmentsActivity
 import com.aspire.aquitoy.ui.login.LoginActivity
@@ -25,23 +24,20 @@ class IntroductionActivity : AppCompatActivity() {
 
         Thread.sleep(1000)
         splashScreen.setKeepOnScreenCondition { false }
-//        startActivity(intent)
-//        finish()
-//
-//        initUI()
+
         when(introductionViewModel.checkDestination()) {
             IntruductionDestination.Home -> navigateToHome()
             IntruductionDestination.Nothing -> navigateToNothing()
         }
 
-        val buttonPatient = binding.btnLoginPatient
-        val buttonNurse = binding.btnLoginNurse
+        val buttonLogin = binding.btnLoginPatient
+        val buttonSignIn = binding.btnSignIn
 
-        buttonPatient.setOnClickListener {
+        buttonLogin.setOnClickListener {
             startActivity(Intent(this, LoginActivity::class.java))
         }
 
-        buttonNurse.setOnClickListener {
+        buttonSignIn.setOnClickListener {
             startActivity(Intent(this, SignInActivity::class.java))
         }
     }
@@ -51,37 +47,4 @@ class IntroductionActivity : AppCompatActivity() {
     private fun navigateToHome(){
         startActivity(Intent(this, FragmentsActivity::class.java))
     }
-
-//    private fun initUI() {
-//        initListeners()
-//        initObservers()
-//    }
-//
-//    private fun initListeners() {
-//        with(binding) {
-//            btnLoginPatient.setOnClickListener { introductionViewModel.onLoginPatientSelected() }
-//            btnLoginNurse.setOnClickListener { introductionViewModel.onLoginNurseSelected() }
-//        }
-//    }
-//
-//    private fun initObservers() {
-//        introductionViewModel.navigateToLoginPatient.observe(this, Observer {
-//            it.getContentIfNotHandled()?.let {
-//                goToLoginPatient()
-//            }
-//        })
-//        introductionViewModel.navigateToLoginNurse.observe(this, Observer {
-//            it.getContentIfNotHandled()?.let {
-//                goToLoginNurse()
-//            }
-//        })
-//    }
-//
-//    private fun goToLoginPatient() {
-//        startActivity(Intent(this, LoginActivity::class.java))
-//    }
-//
-//    private fun goToLoginNurse() {
-//        startActivity(Intent(this,SignInActivity::class.java))
-//    }
 }

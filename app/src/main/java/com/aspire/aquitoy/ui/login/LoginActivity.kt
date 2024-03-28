@@ -12,7 +12,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.aspire.aquitoy.databinding.ActivityLoginPatientBinding
+import com.aspire.aquitoy.databinding.ActivityLoginBinding
 import com.aspire.aquitoy.ui.FragmentsActivity
 import com.aspire.aquitoy.ui.signin.SignInActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -22,18 +22,14 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
-//    companion object {
-//        fun create(context: Context): Intent =
-//            Intent(context, LoginActivity::class.java)
-//    }
 
-    private lateinit var binding: ActivityLoginPatientBinding
+    private lateinit var binding: ActivityLoginBinding
     private val loginViewModel:LoginViewModel by viewModels()
 
     private val googleLauncher = registerForActivityResult(ActivityResultContracts
         .StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) {
-             val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
             try {
                 val account = task.getResult(ApiException::class.java)!!
                 loginViewModel.loginWithGoogle(account.idToken!!) { navigateToFragment() }
@@ -45,7 +41,7 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityLoginPatientBinding.inflate(layoutInflater)
+        binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
         initUI()
     }
@@ -59,7 +55,7 @@ class LoginActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 loginViewModel.isLoading.collect {
-                     binding.pbLoading.isVisible = it
+                    binding.pbLoading.isVisible = it
                 }
             }
         }
@@ -72,18 +68,18 @@ class LoginActivity : AppCompatActivity() {
 
         binding.btnLogin.setOnClickListener{
             loginViewModel.login(
-            email = binding.etEmail.text.toString(),
-            password = binding.etPassword.text.toString()
+                email = binding.etEmail.text.toString(),
+                password = binding.etPassword.text.toString()
             ) { navigateToFragment() }
         }
 
         binding.tvFooter.setOnClickListener {
-             navigateToSignIn()
+            navigateToSignIn()
         }
 
         binding.viewBottom.cardGoogle.setOnClickListener {
-             loginViewModel.onGoogleLoginSelected {
-                 googleLauncher.launch(it.signInIntent)
+            loginViewModel.onGoogleLoginSelected {
+                googleLauncher.launch(it.signInIntent)
             }
         }
     }

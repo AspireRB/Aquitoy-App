@@ -27,10 +27,25 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("debug")
         }
         getByName("debug") {
             applicationIdSuffix = ".debug"
             isDebuggable = true
+        }
+    }
+    flavorDimensions += "version"
+    productFlavors {
+        create("patient") {
+            isDefault = true
+            dimension = "version"
+            applicationIdSuffix = ".patient"
+            versionNameSuffix = "-patient"
+        }
+        create("nurse") {
+            dimension = "version"
+            applicationIdSuffix = ".nurse"
+            versionNameSuffix = "-nurse"
         }
     }
     compileOptions {
@@ -41,6 +56,7 @@ android {
         jvmTarget = "1.8"
     }
     buildFeatures {
+        buildConfig = true
         viewBinding = true
     }
     kotlin {
@@ -53,11 +69,10 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:32.7.4"))
     implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("com.google.android.gms:play-services-auth:21.0.0")
     //Hilt
     implementation("com.google.dagger:hilt-android:2.51")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
-    implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
     kapt("com.google.dagger:hilt-android-compiler:2.51")
     //Activity
     implementation("androidx.activity:activity-ktx:1.8.2")
