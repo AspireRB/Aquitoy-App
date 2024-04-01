@@ -14,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.aspire.aquitoy.databinding.ActivitySignInBinding
 import com.aspire.aquitoy.ui.FragmentsActivity
+import com.aspire.aquitoy.ui.signin.model.UserSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import dagger.hilt.android.AndroidEntryPoint
@@ -23,7 +24,7 @@ import kotlinx.coroutines.launch
 class SignInActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySignInBinding
-    private val signInViewModel:SignInViewModel by viewModels()
+    private val signInViewModel: SignInViewModel by viewModels()
 
     private val googleLauncher = registerForActivityResult(
         ActivityResultContracts
@@ -66,10 +67,16 @@ class SignInActivity : AppCompatActivity() {
             navigateToIntroduction()
         }
 
-        binding.btnCreateAccount.setOnClickListener { signInViewModel.register(
-            email = binding.etEmail.text.toString(),
-            password = binding.etPassword.text.toString()
-            ) { navigateToFragment() }
+        with(binding){
+            btnCreateAccount.setOnClickListener {
+                signInViewModel.register(
+                    UserSignIn(
+                        realName = binding.etRealName.text.toString(),
+                        email = binding.etEmail.text.toString(),
+                        password = binding.etPassword.text.toString()
+                    )
+                ) { navigateToFragment() }
+            }
         }
 
         binding.viewBottom.cardGoogle.setOnClickListener {

@@ -149,17 +149,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tilPassword">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etRepeatPassword"
-                    style="@style/FormEditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/signin_form_repeat_password"
-                    android:imeOptions="actionDone"
-                    android:inputType="textPassword"
-                    android:textColorHighlight="@color/error_dark"
-                    android:textColorHint="@color/error_dark" />
-
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.button.MaterialButton

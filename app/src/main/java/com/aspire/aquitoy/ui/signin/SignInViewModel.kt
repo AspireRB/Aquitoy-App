@@ -1,9 +1,12 @@
 package com.aspire.aquitoy.ui.signin
 
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aspire.aquitoy.data.AuthenticationService
+import com.aspire.aquitoy.data.UserService
+import com.aspire.aquitoy.ui.signin.model.UserSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -14,20 +17,22 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class SignInViewModel @Inject constructor(private val authenticationService: AuthenticationService): ViewModel() {
+class SignInViewModel @Inject constructor(private val authenticationService:
+                                          AuthenticationService, private val userService: UserService): ViewModel() {
     private var _isLoading = MutableStateFlow<Boolean>(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    fun register(email: String, password: String, navigateToFragment: () -> Unit) {
+    fun register(userSignIn: UserSignIn, navigateToFragment: () -> Unit) {
         viewModelScope.launch {
             _isLoading.value = true
 
             try {
                  val result = withContext(Dispatchers.IO) {
-                    authenticationService.register(email, password)
+                    authenticationService.register(userSignIn.email, userSignIn.password)
                 }
 
                 if(result != null) {
+                    userService.createUserTable(userSignIn)
                     navigateToFragment()
                 } else {
                     Log.i("aspire", "error!!")

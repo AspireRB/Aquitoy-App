@@ -6,28 +6,28 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.AuthCredential
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-class AuthenticationService @Inject constructor(private val firebaseAuth: FirebaseAuth,
+@Singleton
+class AuthenticationService @Inject constructor(private val firebase: FirebaseClient,
                                                 @ApplicationContext private val context: Context) {
     suspend fun login(email:String, password:String): FirebaseUser? {
-        return firebaseAuth.signInWithEmailAndPassword(email, password).await().user
+        return firebase.auth.signInWithEmailAndPassword(email, password).await().user
     }
 
     suspend fun register(email: String, password: String): FirebaseUser? {
         return suspendCancellableCoroutine { cancellableContinuation ->
-            firebaseAuth.createUserWithEmailAndPassword(email, password)
+            firebase.auth.createUserWithEmailAndPassword(email, password)
                 .addOnSuccessListener {
-                    val user = it.user
-                    cancellableContinuation.resume(user)
+                    cancellableContinuation.resume(it.user)
                 }
                 .addOnFailureListener {
                     cancellableContinuation.resumeWithException(it)
@@ -40,14 +40,14 @@ class AuthenticationService @Inject constructor(private val firebaseAuth: Fireba
     }
 
     fun logout() {
-        firebaseAuth.signOut()
+        firebase.auth.signOut()
     }
 
-    private fun getCurrentuser() = firebaseAuth.currentUser
+    private fun getCurrentuser() = firebase.auth.currentUser
 
     private suspend fun completeRegisterWithCredential(credential: AuthCredential): FirebaseUser? {
         return suspendCancellableCoroutine { cancellableContinuation ->
-            firebaseAuth.signInWithCredential(credential).addOnSuccessListener {
+            firebase.auth.signInWithCredential(credential).addOnSuccessListener {
                 cancellableContinuation.resume(it.user)
             }.addOnFailureListener {
                 cancellableContinuation.resumeWithException(it)
@@ -66,5 +66,9 @@ class AuthenticationService @Inject constructor(private val firebaseAuth: Fireba
     suspend fun loginWithGoogle(idToken: String): FirebaseUser? {
         val credential = GoogleAuthProvider.getCredential(idToken, null)
         return completeRegisterWithCredential(credential)
+    }
+
+    fun getId(): String {
+        return firebase.auth.currentUser?.uid ?: ""
     }
 }
