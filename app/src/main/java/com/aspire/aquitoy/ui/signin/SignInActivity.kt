@@ -90,10 +90,6 @@ class SignInActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun navigateToSignIn() {
-        startActivity(Intent(this, SignInActivity::class.java))
-    }
-
     private fun navigateToFragment() {
        startActivity(Intent(this, FragmentsActivity::class.java))
     }

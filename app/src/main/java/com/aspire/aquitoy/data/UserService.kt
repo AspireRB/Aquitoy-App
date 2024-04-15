@@ -13,9 +13,10 @@ class UserService @Inject constructor(private val firebase: FirebaseClient) {
     }
 
     suspend fun createUserTable(userSignIn: UserSignIn) = runCatching {
+        val id = firebase.auth.currentUser
 
         val user = hashMapOf(
-//            "id" to userSignIn.id,
+            "id" to id!!.uid!!,
             "email" to userSignIn.email,
             "realname" to userSignIn.realName,
             "rol" to userSignIn.rol
@@ -23,7 +24,7 @@ class UserService @Inject constructor(private val firebase: FirebaseClient) {
 
         firebase.db
             .collection(USER_COLLECTION)
-            .add(user).await()
+            .document(id.uid).set(user)
 
     }.isSuccess
 }

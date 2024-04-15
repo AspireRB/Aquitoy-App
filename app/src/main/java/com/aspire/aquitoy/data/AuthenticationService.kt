@@ -67,8 +67,4 @@ class AuthenticationService @Inject constructor(private val firebase: FirebaseCl
         val credential = GoogleAuthProvider.getCredential(idToken, null)
         return completeRegisterWithCredential(credential)
     }
-
-    fun getId(): String {
-        return firebase.auth.currentUser?.uid ?: ""
-    }
 }

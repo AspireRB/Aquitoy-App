@@ -9,7 +9,4 @@ data class UserSignIn(
     val email: String,
     val password: String,
     val rol: String = "patient"
-){
-    val id: String
-        get() = authenticationService.getId()
-}
+)

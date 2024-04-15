@@ -59,12 +59,12 @@ android {
         buildConfig = true
         viewBinding = true
     }
-    kotlin {
-        jvmToolchain(8)
-    }
 }
 
 dependencies {
+    //Maps
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("com.google.android.gms:play-services-location:21.2.0")
     //Firebase
     implementation(platform("com.google.firebase:firebase-bom:32.7.4"))
     implementation("com.google.firebase:firebase-analytics-ktx")
