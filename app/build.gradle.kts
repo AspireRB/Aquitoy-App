@@ -34,18 +34,30 @@ android {
             isDebuggable = true
         }
     }
-    flavorDimensions += "version"
+    flavorDimensions += "type"
     productFlavors {
         create("patient") {
             isDefault = true
-            dimension = "version"
+            dimension = "type"
             applicationIdSuffix = ".patient"
             versionNameSuffix = "-patient"
         }
         create("nurse") {
-            dimension = "version"
+            dimension = "type"
             applicationIdSuffix = ".nurse"
             versionNameSuffix = "-nurse"
+        }
+    }
+    sourceSets {
+        named("patient") {
+            manifest.srcFile("src/main/AndroidManifest.xml")
+            java.srcDir("src/main/java")
+            res.srcDir("src/main/res")
+        }
+        named("nurse") {
+            manifest.srcFile("src/nurse/AndroidManifest.xml")
+            java.srcDir("src/nurse/java")
+            res.srcDir("src/nurse/res")
         }
     }
     compileOptions {

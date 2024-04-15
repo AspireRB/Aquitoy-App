@@ -1,4 +1,4 @@
-package com.aspire.aquitoy.ui.login
+package com.aspire.aquitoy.nurse.ui.signin
 
 import android.app.Activity
 import android.content.Intent
@@ -12,28 +12,29 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.aspire.aquitoy.databinding.ActivityLoginBinding
-import com.aspire.aquitoy.ui.FragmentsActivity
-import com.aspire.aquitoy.ui.signin.SignInActivity
+import com.aspire.aquitoy.databinding.ActivitySignInBinding
+import com.aspire.aquitoy.nurse.ui.FragmentsActivity
+import com.aspire.aquitoy.nurse.ui.signin.model.UserSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class LoginActivity : AppCompatActivity() {
+class SignInActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityLoginBinding
-    private val loginViewModel: LoginViewModel by viewModels()
+    private lateinit var binding: ActivitySignInBinding
+    private val signInViewModel: com.aspire.aquitoy.nurse.ui.signin.SignInViewModel by viewModels()
 
-    private val googleLauncher = registerForActivityResult(ActivityResultContracts
+    private val googleLauncher = registerForActivityResult(
+        ActivityResultContracts
         .StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) {
             val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
             try {
                 val account = task.getResult(ApiException::class.java)!!
-                loginViewModel.loginWithGoogle(account.idToken!!) { navigateToFragment() }
-            } catch (e:ApiException) {
+                signInViewModel.signInWithGoogle(account.idToken!!) { navigateToFragment() }
+            } catch (e: ApiException) {
                 Toast.makeText(this, "Ha ocurrido un error: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
@@ -41,7 +42,7 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityLoginBinding.inflate(layoutInflater)
+        binding = ActivitySignInBinding.inflate(layoutInflater)
         setContentView(binding.root)
         initUI()
     }
@@ -54,7 +55,7 @@ class LoginActivity : AppCompatActivity() {
     private fun initUIState() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                loginViewModel.isLoading.collect {
+                signInViewModel.isLoading.collect {
                     binding.pbLoading.isVisible = it
                 }
             }
@@ -66,19 +67,20 @@ class LoginActivity : AppCompatActivity() {
             navigateToIntroduction()
         }
 
-        binding.btnLogin.setOnClickListener{
-            loginViewModel.login(
-                email = binding.etEmail.text.toString(),
-                password = binding.etPassword.text.toString()
-            ) { navigateToFragment() }
-        }
-
-        binding.tvFooter.setOnClickListener {
-            navigateToSignIn()
+        with(binding){
+            btnCreateAccount.setOnClickListener {
+                signInViewModel.register(
+                    UserSignIn(
+                        realName = binding.etRealName.text.toString(),
+                        email = binding.etEmail.text.toString(),
+                        password = binding.etPassword.text.toString()
+                    )
+                ) { navigateToFragment() }
+            }
         }
 
         binding.viewBottom.cardGoogle.setOnClickListener {
-            loginViewModel.onGoogleLoginSelected {
+            signInViewModel.onGoogleLoginSelected {
                 googleLauncher.launch(it.signInIntent)
             }
         }
@@ -88,11 +90,7 @@ class LoginActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun navigateToSignIn() {
-        startActivity(Intent(this, SignInActivity::class.java))
-    }
-
     private fun navigateToFragment() {
-        startActivity(Intent(this, FragmentsActivity::class.java))
+       startActivity(Intent(this, FragmentsActivity::class.java))
     }
 }

@@ -1,11 +1,9 @@
-package com.aspire.aquitoy.ui.signin
+package com.aspire.aquitoy.nurse.ui.login
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aspire.aquitoy.data.AuthenticationService
-import com.aspire.aquitoy.data.UserService
-import com.aspire.aquitoy.ui.signin.model.UserSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -16,32 +14,24 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class SignInViewModel @Inject constructor(private val authenticationService:
-                                          AuthenticationService, private val userService: UserService): ViewModel() {
+class LoginViewModel @Inject constructor(private val authenticationService: AuthenticationService): ViewModel() {
     private var _isLoading = MutableStateFlow<Boolean>(false)
-    val isLoading: StateFlow<Boolean> = _isLoading
+    val isLoading:StateFlow<Boolean> = _isLoading
 
-    fun register(userSignIn: UserSignIn, navigateToFragment: () -> Unit) {
+    fun login(email: String, password: String, navigateToFragment: () -> Unit) {
         viewModelScope.launch {
             _isLoading.value = true
-
-            try {
-                 val result = withContext(Dispatchers.IO) {
-                    authenticationService.register(userSignIn.email, userSignIn.password)
-                }
-
-                if(result != null) {
-                    userService.createUserTable(userSignIn)
-                    navigateToFragment()
-                } else {
-                    Log.i("aspire", "error!!")
-                }
-
-            } catch (e: Exception) {
-                Log.i("aspire", e.message.orEmpty())
+            val result = withContext(Dispatchers.IO) {
+                authenticationService.login(email, password)
             }
 
-            _isLoading.value = false
+            if (result != null) {
+                navigateToFragment()
+            } else {
+                Log.i("aspire", "error!!")
+            }
+
+            _isLoading.value = true
         }
     }
 
@@ -50,7 +40,7 @@ class SignInViewModel @Inject constructor(private val authenticationService:
         googleLauncherLogin(gsc)
     }
 
-    fun signInWithGoogle(idToken: String, navigateToFragment: () -> Unit) {
+    fun loginWithGoogle(idToken: String, navigateToFragment: () -> Unit) {
         viewModelScope.launch {
             val result = withContext(Dispatchers.IO) {
                 authenticationService.loginWithGoogle(idToken)

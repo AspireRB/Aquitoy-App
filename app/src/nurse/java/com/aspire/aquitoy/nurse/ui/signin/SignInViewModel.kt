@@ -1,11 +1,11 @@
-package com.aspire.aquitoy.ui.signin
+package com.aspire.aquitoy.nurse.ui.signin
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aspire.aquitoy.data.AuthenticationService
-import com.aspire.aquitoy.data.UserService
-import com.aspire.aquitoy.ui.signin.model.UserSignIn
+import com.aspire.aquitoy.nurse.data.UserService
+import com.aspire.aquitoy.nurse.ui.signin.model.UserSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -17,7 +17,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignInViewModel @Inject constructor(private val authenticationService:
-                                          AuthenticationService, private val userService: UserService): ViewModel() {
+                                          AuthenticationService, private val userService: UserService
+): ViewModel() {
     private var _isLoading = MutableStateFlow<Boolean>(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 

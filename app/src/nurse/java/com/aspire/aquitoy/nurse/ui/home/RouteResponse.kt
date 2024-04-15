@@ -1,4 +1,4 @@
-package com.aspire.aquitoy.ui.home
+package com.aspire.aquitoy.nurse.ui.home
 
 import com.aspire.aquitoy.ui.home.Feature
 import com.aspire.aquitoy.ui.home.Geometry

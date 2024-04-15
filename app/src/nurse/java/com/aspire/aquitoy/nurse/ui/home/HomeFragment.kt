@@ -1,4 +1,4 @@
-package com.aspire.aquitoy.ui.home
+package com.aspire.aquitoy.nurse.ui.home
 
 
 import android.annotation.SuppressLint
@@ -12,10 +12,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.aspire.aquitoy.R
 import com.aspire.aquitoy.data.ApiService
-import com.aspire.aquitoy.data.LocationService
+import com.aspire.aquitoy.nurse.data.LocationService
 import com.aspire.aquitoy.databinding.FragmentHomeBinding
-import com.aspire.aquitoy.ui.home.HomeViewModel
-import com.aspire.aquitoy.ui.home.RouteResponse
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -55,7 +53,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         savedInstanceState: Bundle?
     ): View {
         val homeViewModel =
-            ViewModelProvider(this).get(HomeViewModel::class.java)
+            ViewModelProvider(this).get(com.aspire.aquitoy.nurse.ui.home.HomeViewModel::class.java)
 
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
@@ -131,7 +129,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun drawRoute(routeResponse: RouteResponse?) {
+    private fun drawRoute(routeResponse: com.aspire.aquitoy.nurse.ui.home.RouteResponse?) {
         val polyLineOptions = PolylineOptions()
         routeResponse?.features?.first()?.geometry?.coordinates?.forEach {
             polyLineOptions.add(LatLng(it[1], it[0]))

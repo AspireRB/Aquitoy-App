@@ -1,4 +1,4 @@
-package com.aspire.aquitoy.ui.login
+package com.aspire.aquitoy.nurse.ui.login
 
 import android.app.Activity
 import android.content.Intent
@@ -13,8 +13,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.aspire.aquitoy.databinding.ActivityLoginBinding
-import com.aspire.aquitoy.ui.FragmentsActivity
-import com.aspire.aquitoy.ui.signin.SignInActivity
+import com.aspire.aquitoy.nurse.ui.FragmentsActivity
+import com.aspire.aquitoy.nurse.ui.signin.SignInActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import dagger.hilt.android.AndroidEntryPoint
@@ -72,24 +72,10 @@ class LoginActivity : AppCompatActivity() {
                 password = binding.etPassword.text.toString()
             ) { navigateToFragment() }
         }
-
-        binding.tvFooter.setOnClickListener {
-            navigateToSignIn()
-        }
-
-        binding.viewBottom.cardGoogle.setOnClickListener {
-            loginViewModel.onGoogleLoginSelected {
-                googleLauncher.launch(it.signInIntent)
-            }
-        }
     }
 
     private fun navigateToIntroduction() {
         finish()
-    }
-
-    private fun navigateToSignIn() {
-        startActivity(Intent(this, SignInActivity::class.java))
     }
 
     private fun navigateToFragment() {

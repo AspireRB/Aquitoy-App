@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
-    tools:context=".ui.introduction.IntroductionActivity">
+    tools:context=".nurse.ui.introduction.IntroductionActivity">
 
     <include
         android:id="@+id/viewHeader"
@@ -14,7 +14,7 @@
         android:layout_height="250dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/btnLoginPatient"
+        app:layout_constraintBottom_toTopOf="@+id/btnLogin"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -31,7 +31,7 @@
         app:layout_constraintTop_toBottomOf="@+id/viewHeader" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnLoginPatient"
+        android:id="@+id/btnLogin"
         style="@style/PrimaryButton"
         android:layout_width="0dp"
         android:layout_height="60dp"
