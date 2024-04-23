@@ -1,4 +1,4 @@
-package com.aspire.aquitoy.data.nurse
+package com.aspire.aquitoy.nurse.data
 
 import com.aspire.aquitoy.nurse.ui.home.RouteResponse
 import retrofit2.Response

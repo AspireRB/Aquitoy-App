@@ -1,21 +1,22 @@
 package com.aspire.aquitoy.ui.home
 
-
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.aspire.aquitoy.Common
 import com.aspire.aquitoy.R
 import com.aspire.aquitoy.data.ApiService
 import com.aspire.aquitoy.data.LocationService
 import com.aspire.aquitoy.databinding.FragmentHomeBinding
-import com.aspire.aquitoy.ui.home.HomeViewModel
-import com.aspire.aquitoy.ui.home.RouteResponse
+import com.firebase.geofire.GeoFire
+import com.firebase.geofire.GeoLocation
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -23,11 +24,21 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
+import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class HomeFragment : Fragment(), OnMapReadyCallback {
 
@@ -37,16 +48,53 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     private lateinit var map: GoogleMap
     private val locationService: LocationService = LocationService()
 
+    private var coordinates: LatLng = LatLng(0.0, 0.0)
     private var start: String = ""
     private var end: String = ""
 
     var poly: Polyline? = null
 
+    private lateinit var onlineRef: DatabaseReference
+    private lateinit var currentUserRef: DatabaseReference
+    private lateinit var nurseLocationRef: DatabaseReference
+    private lateinit var geoFire: GeoFire
+    private lateinit var mapFragment: SupportMapFragment
+
+    private val onlineValueEventListener = object: ValueEventListener {
+        override fun onCancelled(error: DatabaseError) {
+            Snackbar.make(mapFragment.requireView(), error.message, Snackbar.LENGTH_SHORT).show()
+        }
+
+        override fun onDataChange(snapshot: DataSnapshot) {
+            if (snapshot.exists())
+                currentUserRef.onDisconnect().removeValue()
+        }
+    }
+
+    override fun onDestroy() {
+        geoFire.removeLocation(FirebaseAuth.getInstance().currentUser!!.uid)
+        onlineRef.removeEventListener(onlineValueEventListener)
+        super.onDestroy()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        registerOnlineSystem()
+    }
+
+    private fun registerOnlineSystem() {
+        onlineRef.addValueEventListener(onlineValueEventListener)
+    }
+
     @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
         map.isMyLocationEnabled = true
-        createMarker()
+        map.animateCamera(
+            CameraUpdateFactory.newLatLngZoom(coordinates, 18f),
+            4000,
+            null
+        )
     }
 
     override fun onCreateView(
@@ -54,21 +102,54 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val homeViewModel =
-            ViewModelProvider(this).get(HomeViewModel::class.java)
+        val homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
 
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
         createMapFragment()
-        initListeners()
+        lifecycleScope.launch {
+            // Inicializar coordinates antes de llamar a initListeners()
+            coordinates = obtainUserLocation() ?: LatLng(0.0, 0.0)
+            initListeners()
+        }
+        onlineRef = FirebaseDatabase.getInstance().getReference().child(".info/connected")
+        currentUserRef = FirebaseDatabase.getInstance().getReference(Common.PATIENT_INFO_REFERENCE)
+            .child(FirebaseAuth.getInstance().currentUser!!.uid)
+        nurseLocationRef = FirebaseDatabase.getInstance().getReference(Common.PATIENT_INFO_REFERENCE)
+        geoFire = GeoFire(nurseLocationRef)
+        registerOnlineSystem()
 
         return root
     }
 
+    private suspend fun obtainUserLocation(): LatLng? {
+        return suspendCoroutine { continuation ->
+            lifecycleScope.launch {
+                val result = locationService.getUserLocation(requireContext())
+                result?.let { location ->
+                    continuation.resume(LatLng(location.latitude, location.longitude))
+                } ?: run {
+                    continuation.resume(null)
+                }
+            }
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+        lifecycleScope.cancel()
+    }
+
     private fun initListeners() {
+        geoFire.setLocation(
+            FirebaseAuth.getInstance().currentUser!!.uid,
+            GeoLocation(coordinates.longitude, coordinates.latitude)
+        )
         _binding!!.btnService.setOnClickListener {
-            start = ""
+            start = "${coordinates.longitude}, ${coordinates.latitude}"
+            Toast.makeText(requireContext(), "coordenadas: $start", Toast.LENGTH_SHORT).show()
             end = ""
             poly?.remove()
             if (poly != null) {
@@ -76,9 +157,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
             }
             if (::map.isInitialized) {
                 map.setOnMapClickListener {
-                    if (start.isEmpty()) {
-                        start = "${it.longitude}, ${it.latitude}"
-                    } else if (end.isEmpty()){
+                    if (end.isEmpty()){
                         end = "${it.longitude}, ${it.latitude}"
                     } else {
                         createRoute()
@@ -88,28 +167,10 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
 
     private fun createMapFragment() {
         val mapFragment = childFragmentManager.findFragmentById(R.id.Map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-    }
-
-    private fun createMarker() {
-        lifecycleScope.launch {
-            val result = locationService.getUserLocation(requireContext())
-            result?.let { location ->
-                val coordinates = LatLng(location.latitude, location.longitude)
-                map.animateCamera(
-                    CameraUpdateFactory.newLatLngZoom(coordinates, 18f),
-                    4000,
-                    null
-                )
-            }
-        }
     }
 
     fun getRetrofit(): Retrofit {

@@ -81,18 +81,18 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:237440083921:android:e2303740478eaedf94e2f0",
+        "mobilesdk_app_id": "1:237440083921:android:15142da09e22692694e2f0",
         "android_client_info": {
-          "package_name": "com.aspire.aquitoy.nurse.debug"
+          "package_name": "com.aspire.aquitoy.nurse"
         }
       },
       "oauth_client": [
         {
-          "client_id": "237440083921-c7t5s568voq34nnmsb6k7ieispr339j0.apps.googleusercontent.com",
+          "client_id": "237440083921-5o8k8i8rnvgbrqchiqpv1797h0dkf4fg.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.aspire.aquitoy.nurse.debug",
-            "certificate_hash": "49f7c9b52490b595992778fd77bf05206bd424c5"
+            "package_name": "com.aspire.aquitoy.nurse",
+            "certificate_hash": "0842ab25df5369ecb1b7b3a181701c8cdf8edc97"
           }
         },
         {
@@ -118,17 +118,17 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:237440083921:android:030e2d4526bba0ab94e2f0",
+        "mobilesdk_app_id": "1:237440083921:android:e2303740478eaedf94e2f0",
         "android_client_info": {
-          "package_name": "com.aspire.aquitoy.patient.debug"
+          "package_name": "com.aspire.aquitoy.nurse.debug"
         }
       },
       "oauth_client": [
         {
-          "client_id": "237440083921-rlil6ro21vve86u1f79c4for520aofit.apps.googleusercontent.com",
+          "client_id": "237440083921-c7t5s568voq34nnmsb6k7ieispr339j0.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.aspire.aquitoy.patient.debug",
+            "package_name": "com.aspire.aquitoy.nurse.debug",
             "certificate_hash": "49f7c9b52490b595992778fd77bf05206bd424c5"
           }
         },

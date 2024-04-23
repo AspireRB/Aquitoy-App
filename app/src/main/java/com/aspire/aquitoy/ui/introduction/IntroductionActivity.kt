@@ -28,6 +28,7 @@ class IntroductionActivity : AppCompatActivity() {
         when(introductionViewModel.checkDestination()) {
             IntruductionDestination.Home -> navigateToHome()
             IntruductionDestination.Nothing -> navigateToNothing()
+            else -> {}
         }
 
         val buttonLogin = binding.btnLogin

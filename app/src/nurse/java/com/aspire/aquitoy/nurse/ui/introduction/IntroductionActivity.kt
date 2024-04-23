@@ -5,7 +5,7 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.aspire.aquitoy.databinding.ActivityIntroductionBinding
+import com.aspire.aquitoy.nurse.databinding.ActivityIntroductionBinding
 import com.aspire.aquitoy.nurse.ui.FragmentsActivity
 import com.aspire.aquitoy.nurse.ui.login.LoginActivity
 import dagger.hilt.android.AndroidEntryPoint

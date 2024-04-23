@@ -21,7 +21,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key"/>
         <activity android:name=".nurse.ui.FragmentsActivity" />
-        <activity android:name=".nurse.ui.signin.SignInActivity" />
         <activity android:name=".nurse.ui.login.LoginActivity" />
         <activity
             android:name=".nurse.ui.introduction.IntroductionActivity"

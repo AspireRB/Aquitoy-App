@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.aspire.aquitoy.databinding.FragmentRequestsBinding
+import com.aspire.aquitoy.nurse.databinding.FragmentRequestsBinding
 
 class RequestsFragment : Fragment() {
 

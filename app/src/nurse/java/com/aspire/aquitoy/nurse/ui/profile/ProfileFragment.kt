@@ -8,9 +8,9 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.aspire.aquitoy.databinding.FragmentProfileBinding
+import com.aspire.aquitoy.nurse.databinding.FragmentProfileBinding
 import com.aspire.aquitoy.nurse.ui.introduction.IntroductionActivity
-import com.aspire.aquitoy.ui.profile.ProfileViewModel
+import com.aspire.aquitoy.nurse.ui.profile.ProfileViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.WithFragmentBindings
 

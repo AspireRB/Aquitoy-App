@@ -1,8 +1,7 @@
 package com.aspire.aquitoy.nurse.ui.introduction
 
 import androidx.lifecycle.ViewModel
-import com.aspire.aquitoy.data.AuthenticationService
-import com.aspire.aquitoy.ui.introduction.IntruductionDestination
+import com.aspire.aquitoy.nurse.data.AuthenticationService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 

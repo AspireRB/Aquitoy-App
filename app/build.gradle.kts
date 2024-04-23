@@ -34,32 +34,25 @@ android {
             isDebuggable = true
         }
     }
-    flavorDimensions += "type"
-    productFlavors {
-        create("patient") {
-            isDefault = true
-            dimension = "type"
-            applicationIdSuffix = ".patient"
-            versionNameSuffix = "-patient"
-        }
-        create("nurse") {
-            dimension = "type"
-            applicationIdSuffix = ".nurse"
-            versionNameSuffix = "-nurse"
-        }
-    }
-    sourceSets {
-        named("patient") {
-            manifest.srcFile("src/main/AndroidManifest.xml")
-            java.srcDir("src/main/java")
-            res.srcDir("src/main/res")
-        }
-        named("nurse") {
-            manifest.srcFile("src/nurse/AndroidManifest.xml")
-            java.srcDir("src/nurse/java")
-            res.srcDir("src/nurse/res")
-        }
-    }
+//    flavorDimensions += "type"
+//    productFlavors {
+//        create("patient") {
+//            isDefault = true
+//            dimension = "type"
+//            applicationIdSuffix = ".patient"
+//            versionNameSuffix = "-patient"
+//        }
+//        create("nurse") {
+//            dimension = "type"
+//            applicationIdSuffix = ".nurse"
+//            versionNameSuffix = "-nurse"
+//        }
+//    }
+//    sourceSets.getByName("nurse") {
+//        manifest.srcFile("src/nurse/AndroidManifest.xml")
+//        java.srcDir("src/nurse/java")
+//        resources.srcDir("src/nurse/res")
+//    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -68,15 +61,15 @@ android {
         jvmTarget = "1.8"
     }
     buildFeatures {
-        buildConfig = true
+//        buildConfig = true
         viewBinding = true
     }
 }
 
 dependencies {
     //Retrofit
-    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     //Maps
     implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation("com.google.android.gms:play-services-location:21.2.0")
@@ -86,6 +79,7 @@ dependencies {
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("com.google.android.gms:play-services-auth:21.0.0")
+    implementation("com.firebase:geofire-android:3.2.0")
     //Hilt
     implementation("com.google.dagger:hilt-android:2.51")
     kapt("com.google.dagger:hilt-android-compiler:2.51")
@@ -95,20 +89,20 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
     // ViewModel
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
     // LiveData
-    implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
-    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     //Corrutinas
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.0")
     //Splash
-    implementation ("androidx.core:core-splashscreen:1.0.1")
+    implementation("androidx.core:core-splashscreen:1.0.1")
     //Timber
-    implementation ("com.jakewharton.timber:timber:5.0.1")
+    implementation("com.jakewharton.timber:timber:5.0.1")
     //Lottie
-    implementation ("com.airbnb.android:lottie:6.4.0")
+    implementation("com.airbnb.android:lottie:6.4.0")
     //Default
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")

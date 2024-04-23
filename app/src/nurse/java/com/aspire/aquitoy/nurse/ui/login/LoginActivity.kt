@@ -12,9 +12,8 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.aspire.aquitoy.databinding.ActivityLoginBinding
+import com.aspire.aquitoy.nurse.databinding.ActivityLoginBinding
 import com.aspire.aquitoy.nurse.ui.FragmentsActivity
-import com.aspire.aquitoy.nurse.ui.signin.SignInActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import dagger.hilt.android.AndroidEntryPoint
@@ -25,19 +24,6 @@ class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
     private val loginViewModel: LoginViewModel by viewModels()
-
-    private val googleLauncher = registerForActivityResult(ActivityResultContracts
-        .StartActivityForResult()) { result: ActivityResult ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-            try {
-                val account = task.getResult(ApiException::class.java)!!
-                loginViewModel.loginWithGoogle(account.idToken!!) { navigateToFragment() }
-            } catch (e:ApiException) {
-                Toast.makeText(this, "Ha ocurrido un error: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -10,10 +10,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.aspire.aquitoy.R
-import com.aspire.aquitoy.data.ApiService
+import com.aspire.aquitoy.nurse.R
+import com.aspire.aquitoy.nurse.data.ApiService
 import com.aspire.aquitoy.nurse.data.LocationService
-import com.aspire.aquitoy.databinding.FragmentHomeBinding
+import com.aspire.aquitoy.nurse.databinding.FragmentHomeBinding
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -53,7 +53,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         savedInstanceState: Bundle?
     ): View {
         val homeViewModel =
-            ViewModelProvider(this).get(com.aspire.aquitoy.nurse.ui.home.HomeViewModel::class.java)
+            ViewModelProvider(this).get(HomeViewModel::class.java)
 
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
@@ -129,7 +129,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun drawRoute(routeResponse: com.aspire.aquitoy.nurse.ui.home.RouteResponse?) {
+    private fun drawRoute(routeResponse: RouteResponse?) {
         val polyLineOptions = PolylineOptions()
         routeResponse?.features?.first()?.geometry?.coordinates?.forEach {
             polyLineOptions.add(LatLng(it[1], it[0]))
