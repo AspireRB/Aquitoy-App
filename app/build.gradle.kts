@@ -34,25 +34,6 @@ android {
             isDebuggable = true
         }
     }
-//    flavorDimensions += "type"
-//    productFlavors {
-//        create("patient") {
-//            isDefault = true
-//            dimension = "type"
-//            applicationIdSuffix = ".patient"
-//            versionNameSuffix = "-patient"
-//        }
-//        create("nurse") {
-//            dimension = "type"
-//            applicationIdSuffix = ".nurse"
-//            versionNameSuffix = "-nurse"
-//        }
-//    }
-//    sourceSets.getByName("nurse") {
-//        manifest.srcFile("src/nurse/AndroidManifest.xml")
-//        java.srcDir("src/nurse/java")
-//        resources.srcDir("src/nurse/res")
-//    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -61,12 +42,14 @@ android {
         jvmTarget = "1.8"
     }
     buildFeatures {
-//        buildConfig = true
         viewBinding = true
     }
 }
 
 dependencies {
+    //RxJava
+    implementation("io.reactivex.rxjava2:rxandroid:2.1.1")
+    implementation("io.reactivex.rxjava2:rxjava:2.2.9")
     //Dexter
     implementation("com.karumi:dexter:6.1.2")
     //Retrofit
@@ -80,13 +63,13 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-firestore-ktx")
-    implementation("com.google.android.gms:play-services-auth:21.0.0")
+    implementation("com.google.android.gms:play-services-auth:21.1.0")
     implementation("com.firebase:geofire-android:3.2.0")
     //Hilt
     implementation("com.google.dagger:hilt-android:2.51")
     kapt("com.google.dagger:hilt-android-compiler:2.51")
     //Activity
-    implementation("androidx.activity:activity-ktx:1.8.2")
+    implementation("androidx.activity:activity-ktx:1.9.0")
     // Fragment
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
@@ -106,7 +89,7 @@ dependencies {
     //Lottie
     implementation("com.airbnb.android:lottie:6.4.0")
     //Default
-    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.core:core-ktx:1.13.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")

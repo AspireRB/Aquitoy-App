@@ -1,5 +1,6 @@
 package com.aspire.aquitoy.model
 
 class NurseInfoModel {
-    var rating = 0.0
+    var realname: String?=null
+    var rating = 0.0;
 }
