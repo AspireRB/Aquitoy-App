@@ -34,7 +34,6 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.Polyline
@@ -432,12 +431,9 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
     override fun onNurseInfoLoadSuccess(nurseGeoModel: NurseGeoModel?) {
         if (!common.markerList.containsKey(nurseGeoModel!!.key)) {
             val marker = map.addMarker(MarkerOptions()
-                .position(LatLng(nurseGeoModel!!.geoLocation!!.latitude, nurseGeoModel!!.geoLocation!!.longitude))
-                .flat(true)
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_icon_run)))
-            Log.d("marker", "entro y deberia crear")
-            Log.d("markerNurse", "Ubicación Nurse: ${nurseGeoModel!!.geoLocation!!.latitude}, " +
-                    "${nurseGeoModel!!.geoLocation!!.longitude}")
+                .position(LatLng(nurseGeoModel!!.geoLocation!!.longitude, nurseGeoModel!!
+                    .geoLocation!!.latitude))
+                .flat(true))
             if (marker != null) {  // Check if marker is not null
                 common.markerList.put(nurseGeoModel!!.key!!, marker)
             }
