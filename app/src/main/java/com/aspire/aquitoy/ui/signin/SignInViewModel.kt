@@ -3,7 +3,9 @@ package com.aspire.aquitoy.ui.signin
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.aspire.aquitoy.common.common
 import com.aspire.aquitoy.data.AuthenticationService
+import com.aspire.aquitoy.data.FirebaseClient
 import com.aspire.aquitoy.data.UserService
 import com.aspire.aquitoy.ui.signin.model.UserSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -16,10 +18,10 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class SignInViewModel @Inject constructor(private val authenticationService:
-                                          AuthenticationService, private val userService: UserService): ViewModel() {
+class SignInViewModel @Inject constructor(private val authenticationService: AuthenticationService, private val firebaseClient: FirebaseClient, private val userService: UserService): ViewModel() {
     private var _isLoading = MutableStateFlow<Boolean>(false)
     val isLoading: StateFlow<Boolean> = _isLoading
+    val patientInfoRef = firebaseClient.db_rt.child(common.PATIENT_INFO_REFERENCE)
 
     fun register(userSignIn: UserSignIn, navigateToFragment: () -> Unit) {
         viewModelScope.launch {
@@ -32,6 +34,7 @@ class SignInViewModel @Inject constructor(private val authenticationService:
 
                 if(result != null) {
                     userService.createUserTable(userSignIn)
+                    patientInfoRef.child(firebaseClient.auth.currentUser!!.uid).setValue(userSignIn)
                     navigateToFragment()
                 } else {
                     Log.i("aspire", "error!!")
