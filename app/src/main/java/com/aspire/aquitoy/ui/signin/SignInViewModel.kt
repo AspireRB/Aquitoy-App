@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+@Suppress("DEPRECATION")
 @HiltViewModel
 class SignInViewModel @Inject constructor(private val authenticationService: AuthenticationService, private val firebaseClient: FirebaseClient): ViewModel() {
     private var _isLoading = MutableStateFlow<Boolean>(false)

@@ -16,6 +16,7 @@ import javax.inject.Singleton
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
+@Suppress("DEPRECATION")
 @Singleton
 class AuthenticationService @Inject constructor(private val firebase: FirebaseClient,
                                                 @ApplicationContext private val context: Context) {

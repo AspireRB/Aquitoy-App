@@ -69,4 +69,5 @@
     <string name="permission_require">Permission Location required</string>
     <string name="nurse_not_found">Nurse not found</string>
     <string name="key_not_found">Key nurse not found</string>
+    <string name="default_web_client_id">237440083921-v4llnkdlksv72qhfqki9t30kq2sm585v.apps.googleusercontent.com</string>
 </resources>

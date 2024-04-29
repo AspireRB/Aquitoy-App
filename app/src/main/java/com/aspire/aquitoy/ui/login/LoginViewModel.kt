@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+@Suppress("DEPRECATION")
 @HiltViewModel
 class LoginViewModel @Inject constructor(private val authenticationService: AuthenticationService): ViewModel() {
     private var _isLoading = MutableStateFlow<Boolean>(false)
