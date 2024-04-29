@@ -13,6 +13,7 @@ import android.widget.RelativeLayout
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.aspire.aquitoy.Callback.FirebaseFailedListener
 import com.aspire.aquitoy.Callback.FirebaseNurseInfoListener
 import com.aspire.aquitoy.R
@@ -50,6 +51,7 @@ import com.karumi.dexter.listener.PermissionDeniedResponse
 import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -60,6 +62,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
 
+@AndroidEntryPoint
 @Suppress("DEPRECATION")
 class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
 
@@ -96,7 +99,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
 
     override fun onDestroy() {
         fusedLocationProviderClient.removeLocationUpdates(locationCallback)
-
         super.onDestroy()
     }
 
@@ -370,7 +372,23 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
             map.setOnMarkerClickListener { marker ->
                 val nurseID = marker.title
                 if (nurseID != null) {
-                    Log.d("nurseID2", "Encontrado ID: ${nurseID}")
+                    lifecycleScope.launch {
+                        val nurseLocationService = homeViewModel.initialServiceNurse(nurseID)
+                        Log.d("nurseLocationService", "Datos ${nurseLocationService}")
+                        _binding!!.btnService.setOnClickListener {
+
+                            start = "${coordinates.longitude}, ${coordinates.latitude}"
+                            end = "${nurseLocationService!!.longitude}, ${nurseLocationService!!
+                            .latitude}"
+                            poly?.remove()
+                            if (poly != null) {
+                                poly = null
+                            }
+                            if (::map.isInitialized) {
+                                createRoute()
+                            }
+                        }
+                    }
                 } else {
                     Log.d("nurseID", "Falla")
                 }
@@ -378,23 +396,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
             }
         } else {
             Log.d("Map", "El mapa no está inicializado aún")
-        }
-        _binding!!.btnService.setOnClickListener {
-            start = "${coordinates.longitude}, ${coordinates.latitude}"
-            end = ""
-            poly?.remove()
-            if (poly != null) {
-                poly = null
-            }
-            if (::map.isInitialized) {
-                map.setOnMapClickListener {
-                    if (end.isEmpty()){
-                        end = "${it.longitude}, ${it.latitude}"
-                    } else {
-                        createRoute()
-                    }
-                }
-            }
         }
     }
 
