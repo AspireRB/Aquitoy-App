@@ -14,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.aspire.aquitoy.databinding.ActivitySignInBinding
 import com.aspire.aquitoy.ui.FragmentsActivity
+import com.aspire.aquitoy.ui.signin.model.UserSetInfo
 import com.aspire.aquitoy.ui.signin.model.UserSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
@@ -71,9 +72,11 @@ class SignInActivity : AppCompatActivity() {
             btnCreateAccount.setOnClickListener {
                 signInViewModel.register(
                     UserSignIn(
-                        realName = binding.etRealName.text.toString(),
                         email = binding.etEmail.text.toString(),
                         password = binding.etPassword.text.toString()
+                    ), UserSetInfo(
+                        realName = binding.etRealName.text.toString(),
+                        email = binding.etEmail.text.toString()
                     )
                 ) { navigateToFragment() }
             }

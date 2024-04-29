@@ -10,7 +10,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
-import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -34,6 +33,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.Polyline
@@ -60,6 +60,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
 
+@Suppress("DEPRECATION")
 class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
 
     private var _binding: FragmentHomeBinding? = null
@@ -95,7 +96,13 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
 
     override fun onDestroy() {
         fusedLocationProviderClient.removeLocationUpdates(locationCallback)
+
         super.onDestroy()
+    }
+
+    override fun onResume() {
+        loadAvailableNurse()
+        super.onResume()
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -133,7 +140,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
                         .parent!! as View)
                         .findViewById<View>("2".toInt())
                     val params = locationButton.layoutParams as RelativeLayout.LayoutParams
-                    params.addRule(RelativeLayout.ALIGN_TOP, 0)
+                    params.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0)
                     params.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE)
                     params.bottomMargin = 250
                 }
@@ -143,18 +150,12 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
                         Snackbar.LENGTH_LONG).show()
                 }
 
-                override fun onPermissionRationaleShouldBeShown(
-                    p0: PermissionRequest?,
-                    p1: PermissionToken?
-                ) {
+                override fun onPermissionRationaleShouldBeShown(p0: PermissionRequest?, p1: PermissionToken?) {
 
                 }
 
             })
             .check()
-
-        map.uiSettings.isZoomControlsEnabled = true
-
     }
 
     override fun onCreateView(
@@ -168,7 +169,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
 
         createMapFragment()
         init()
-        initListeners()
 
         return root
     }
@@ -215,13 +215,11 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-//            Snackbar.make(requireView(), getString(R.string.permission_require), Snackbar
-//                .LENGTH_SHORT).show()
             return
         }
         fusedLocationProviderClient.requestLocationUpdates(locationRequest,locationCallback, Looper.myLooper())
 
-        loadAvailableNurse();
+        loadAvailableNurse()
     }
 
     private fun loadAvailableNurse() {
@@ -245,7 +243,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
                     //Query
                     val nurse_location_ref = FirebaseDatabase.getInstance().getReference(common.NURSE_LOCATION_REFERENCES)
                     val geoFire = GeoFire(nurse_location_ref)
-
                     val geoQuery = geoFire.queryAtLocation(GeoLocation(location.latitude,location
                         .longitude),distance)
                     geoQuery.removeAllListeners()
@@ -256,7 +253,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
                             val geoLocation = GeoLocation(geoQueryModel!!.l!![0], geoQueryModel!!
                                 .l!![1])
                             val nurseGeoModel = NurseGeoModel(snapshot.key,geoLocation)
-
                             val newNurseLocation = Location("")
                             newNurseLocation.latitude = geoLocation.latitude
                             newNurseLocation.longitude = geoLocation.longitude
@@ -265,10 +261,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
                                 findNurseByKey(nurseGeoModel)
                         }
 
-                        override fun onChildChanged(
-                            snapshot: DataSnapshot,
-                            previousChildName: String?
-                        ) {
+                        override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
 
                         }
 
@@ -276,10 +269,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
 
                         }
 
-                        override fun onChildMoved(
-                            snapshot: DataSnapshot,
-                            previousChildName: String?
-                        ) {
+                        override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
 
                         }
 
@@ -309,7 +299,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
                                 distance++
                                 loadAvailableNurse()
                             } else {
-                                Toast.makeText(requireContext(),"add",Toast.LENGTH_SHORT).show()
                                 distance = 0.0
                                 addNurseMarker()
                             }
@@ -328,6 +317,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
                         .show()
                 }
             }
+        initListeners()
     }
 
     private fun addNurseMarker() {
@@ -374,9 +364,23 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
     }
 
     private fun initListeners() {
+        // Verificar si map está inicializado antes de usarlo
+        if (::map.isInitialized)  {
+            // Configurar el listener del marcador solo si map está inicializado
+            map.setOnMarkerClickListener { marker ->
+                val nurseID = marker.title
+                if (nurseID != null) {
+                    Log.d("nurseID2", "Encontrado ID: ${nurseID}")
+                } else {
+                    Log.d("nurseID", "Falla")
+                }
+                true // Devuelve true para indicar que has manejado el evento
+            }
+        } else {
+            Log.d("Map", "El mapa no está inicializado aún")
+        }
         _binding!!.btnService.setOnClickListener {
             start = "${coordinates.longitude}, ${coordinates.latitude}"
-            Toast.makeText(requireContext(), "coordenadas: $start", Toast.LENGTH_SHORT).show()
             end = ""
             poly?.remove()
             if (poly != null) {
@@ -433,7 +437,10 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
             val marker = map.addMarker(MarkerOptions()
                 .position(LatLng(nurseGeoModel!!.geoLocation!!.longitude, nurseGeoModel!!
                     .geoLocation!!.latitude))
-                .flat(true))
+                .flat(true)
+                //.title(common.buildName(nurseGeoModel.nurseInfoModel!!.realName))
+                .title(nurseGeoModel.key)
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_nurse)))
             if (marker != null) {  // Check if marker is not null
                 common.markerList.put(nurseGeoModel!!.key!!, marker)
             }
@@ -444,7 +451,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
             .child(nurseGeoModel!!.key!!)
         nurseLocation.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                if(!snapshot.hasChildren()) {
+                if(!snapshot.exists()) {
                     if(common.markerList.get(nurseGeoModel!!.key!!) != null){
                         val marker = common.markerList.get(nurseGeoModel!!.key!!)
                         marker!!.remove()

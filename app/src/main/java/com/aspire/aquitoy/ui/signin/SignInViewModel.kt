@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.aspire.aquitoy.common.common
 import com.aspire.aquitoy.data.AuthenticationService
 import com.aspire.aquitoy.data.FirebaseClient
-import com.aspire.aquitoy.data.UserService
+import com.aspire.aquitoy.ui.signin.model.UserSetInfo
 import com.aspire.aquitoy.ui.signin.model.UserSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,12 +18,12 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class SignInViewModel @Inject constructor(private val authenticationService: AuthenticationService, private val firebaseClient: FirebaseClient, private val userService: UserService): ViewModel() {
+class SignInViewModel @Inject constructor(private val authenticationService: AuthenticationService, private val firebaseClient: FirebaseClient): ViewModel() {
     private var _isLoading = MutableStateFlow<Boolean>(false)
     val isLoading: StateFlow<Boolean> = _isLoading
     val patientInfoRef = firebaseClient.db_rt.child(common.PATIENT_INFO_REFERENCE)
 
-    fun register(userSignIn: UserSignIn, navigateToFragment: () -> Unit) {
+    fun register(userSignIn: UserSignIn, userSetInfo: UserSetInfo, navigateToFragment: () -> Unit) {
         viewModelScope.launch {
             _isLoading.value = true
 
@@ -33,8 +33,7 @@ class SignInViewModel @Inject constructor(private val authenticationService: Aut
                 }
 
                 if(result != null) {
-                    userService.createUserTable(userSignIn)
-                    patientInfoRef.child(firebaseClient.auth.currentUser!!.uid).setValue(userSignIn)
+                    patientInfoRef.child(firebaseClient.auth.currentUser!!.uid).setValue(userSetInfo)
                     navigateToFragment()
                 } else {
                     Log.i("aspire", "error!!")

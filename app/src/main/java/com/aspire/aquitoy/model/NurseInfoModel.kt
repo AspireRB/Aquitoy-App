@@ -1,6 +1,7 @@
 package com.aspire.aquitoy.model
 
 class NurseInfoModel {
-    var realname: String?=null
-    var email: String?=null
+    var realName: String ?= null
+    var email: String ?= null
+    var rol: String ?= null
 }

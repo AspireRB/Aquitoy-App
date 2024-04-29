@@ -10,4 +10,8 @@ object common {
     val PATIENT_LOCATION_REFERENCE: String = "/PatientLocation"
     val NURSE_INFO_REFERENCES: String = "/NurseInfo"
     val NURSE_LOCATION_REFERENCES: String = "/NurseLocation"
+
+    fun buildName(realName: String?): String {
+        return  java.lang.StringBuilder(realName!!).toString()
+    }
 }
