@@ -1,6 +1,6 @@
 package com.aspire.aquitoy.common
 
-import com.aspire.aquitoy.model.NurseGeoModel
+import com.aspire.aquitoy.ui.home.model.NurseGeoModel
 import com.google.android.gms.maps.model.Marker
 
 object common {

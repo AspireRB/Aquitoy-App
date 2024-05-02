@@ -1,6 +1,8 @@
 package com.aspire.aquitoy.ui.signin
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aspire.aquitoy.common.common
@@ -19,7 +21,10 @@ import javax.inject.Inject
 
 @Suppress("DEPRECATION")
 @HiltViewModel
-class SignInViewModel @Inject constructor(private val authenticationService: AuthenticationService, private val firebaseClient: FirebaseClient): ViewModel() {
+class SignInViewModel @Inject constructor(private val authenticationService:
+                                          AuthenticationService, private val firebaseClient:
+FirebaseClient, private val context: Context
+): ViewModel() {
     private var _isLoading = MutableStateFlow<Boolean>(false)
     val isLoading: StateFlow<Boolean> = _isLoading
     val patientInfoRef = firebaseClient.db_rt.child(common.PATIENT_INFO_REFERENCE)
@@ -27,24 +32,33 @@ class SignInViewModel @Inject constructor(private val authenticationService: Aut
     fun register(userSignIn: UserSignIn, userSetInfo: UserSetInfo, navigateToFragment: () -> Unit) {
         viewModelScope.launch {
             _isLoading.value = true
-
             try {
                  val result = withContext(Dispatchers.IO) {
                     authenticationService.register(userSignIn.email, userSignIn.password)
                 }
-
                 if(result != null) {
                     patientInfoRef.child(firebaseClient.auth.currentUser!!.uid).setValue(userSetInfo)
                     navigateToFragment()
+                    showToast("Ingreso exitoso")
                 } else {
+                    showToast("Hubo algun error")
                     Log.i("aspire", "error!!")
                 }
-
             } catch (e: Exception) {
+                showToast("Email ya registrado")
                 Log.i("aspire", e.message.orEmpty())
             }
-
             _isLoading.value = false
+        }
+    }
+
+    private fun showToast(message: String) {
+        viewModelScope.launch(Dispatchers.Main) {
+            Toast.makeText(
+                context,
+                message,
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
@@ -60,6 +74,7 @@ class SignInViewModel @Inject constructor(private val authenticationService: Aut
             }
             if (result != null) {
                 navigateToFragment()
+                showToast("Ingreso exitoso")
             }
         }
     }

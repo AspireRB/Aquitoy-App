@@ -1,7 +1,5 @@
-package com.aspire.aquitoy.ui.home
+package com.aspire.aquitoy.ui.home.model
 
-import com.aspire.aquitoy.ui.home.Feature
-import com.aspire.aquitoy.ui.home.Geometry
 import com.google.gson.annotations.SerializedName
 
 data class RouteResponse(@SerializedName("features") val features:List<Feature>)

@@ -1,5 +1,6 @@
 package com.aspire.aquitoy.ui.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.aspire.aquitoy.data.DatabaseService
 import com.google.android.gms.maps.model.LatLng
@@ -11,6 +12,15 @@ class HomeViewModel @Inject constructor(private val databaseService: DatabaseSer
     suspend fun initialServiceNurse(nurseID: String): LatLng? {
         val nurseLocation = databaseService.initialService(nurseID)
         return nurseLocation
+    }
+
+    fun createToken() {
+        val result = databaseService.insertToken()
+        if (result.isComplete){
+            Log.d("Token", "Agregado")
+        } else {
+            Log.d("Token", "Fallo")
+        }
     }
 
 }

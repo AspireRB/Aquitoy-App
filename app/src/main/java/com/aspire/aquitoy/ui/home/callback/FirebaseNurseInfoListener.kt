@@ -1,6 +1,6 @@
-package com.aspire.aquitoy.Callback
+package com.aspire.aquitoy.ui.home.callback
 
-import com.aspire.aquitoy.model.NurseGeoModel
+import com.aspire.aquitoy.ui.home.model.NurseGeoModel
 
 interface FirebaseNurseInfoListener {
     fun onNurseInfoLoadSuccess(nurseGeoModel: NurseGeoModel?)

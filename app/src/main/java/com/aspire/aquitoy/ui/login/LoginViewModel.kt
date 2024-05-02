@@ -31,8 +31,8 @@ class LoginViewModel @Inject constructor(private val authenticationService:
                     authenticationService.login(email, password)
                 }
                 if (result != null) {
-                    showToast("Ingreso exitoso")
                     navigateToFragment()
+                    showToast("Ingreso exitoso")
                 } else {
                     showToast("Credenciales de rol incorrectas")
                     Log.d("Incio de sesión", "error")
@@ -66,6 +66,7 @@ class LoginViewModel @Inject constructor(private val authenticationService:
             }
             if (result != null) {
                 navigateToFragment()
+                showToast("Ingreso exitoso")
             }
         }
     }

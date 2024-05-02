@@ -14,14 +14,15 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.aspire.aquitoy.Callback.FirebaseFailedListener
-import com.aspire.aquitoy.Callback.FirebaseNurseInfoListener
 import com.aspire.aquitoy.R
 import com.aspire.aquitoy.common.common
 import com.aspire.aquitoy.data.ApiService
 import com.aspire.aquitoy.databinding.FragmentHomeBinding
-import com.aspire.aquitoy.model.GeoQueryModel
-import com.aspire.aquitoy.model.NurseGeoModel
+import com.aspire.aquitoy.ui.home.callback.FirebaseFailedListener
+import com.aspire.aquitoy.ui.home.callback.FirebaseNurseInfoListener
+import com.aspire.aquitoy.ui.home.model.GeoQueryModel
+import com.aspire.aquitoy.ui.home.model.NurseGeoModel
+import com.aspire.aquitoy.ui.home.model.RouteResponse
 import com.firebase.geofire.GeoFire
 import com.firebase.geofire.GeoLocation
 import com.firebase.geofire.GeoQueryEventListener
@@ -366,6 +367,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
     }
 
     private fun initListeners() {
+        homeViewModel.createToken()
         // Verificar si map está inicializado antes de usarlo
         if (::map.isInitialized)  {
             // Configurar el listener del marcador solo si map está inicializado

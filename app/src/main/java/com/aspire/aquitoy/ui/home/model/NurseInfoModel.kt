@@ -1,4 +1,4 @@
-package com.aspire.aquitoy.model
+package com.aspire.aquitoy.ui.home.model
 
 class NurseInfoModel {
     var realName: String ?= null

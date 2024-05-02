@@ -1,4 +1,4 @@
-package com.aspire.aquitoy.Callback
+package com.aspire.aquitoy.ui.home.callback
 
 interface FirebaseFailedListener {
     fun onFirebaseFailed(message : String)
