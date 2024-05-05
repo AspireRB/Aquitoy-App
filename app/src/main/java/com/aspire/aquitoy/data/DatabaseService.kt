@@ -5,6 +5,9 @@ import android.util.Log
 import com.aspire.aquitoy.common.common
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.Task
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -15,7 +18,7 @@ import kotlin.coroutines.suspendCoroutine
 @Singleton
 class DatabaseService @Inject constructor(private val firebaseClient: FirebaseClient,
                                           @ApplicationContext private val context: Context) {
-    suspend fun initialService(nurseID: String): LatLng? {
+    suspend fun getLocationNurse(nurseID: String): LatLng? {
         return suspendCoroutine { continuation ->
             val nurseLocationRef = firebaseClient.db_rt.child(common.NURSE_LOCATION_REFERENCES)
             nurseLocationRef.child(nurseID).get().addOnSuccessListener { dataSnapshot ->
@@ -52,5 +55,28 @@ class DatabaseService @Inject constructor(private val firebaseClient: FirebaseCl
                 }
             }
         }
+    }
+
+    fun checkIdService(serviceId: String): Boolean {
+        val serviceIdsRef = firebaseClient.db_rt.child(common.SERVICE_INFO_REFERENCES)
+        var isUsed = false
+
+        // Realizar consulta en la base de datos
+        serviceIdsRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                for (childSnapshot in dataSnapshot.children) {
+                    val id = childSnapshot.getValue(String::class.java)
+                    if (id == serviceId) {
+                        isUsed = true
+                        break
+                    }
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.d("ServiceId", "Database Error")
+            }
+        })
+        return isUsed
     }
 }

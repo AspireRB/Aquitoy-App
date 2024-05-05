@@ -223,6 +223,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
         fusedLocationProviderClient.requestLocationUpdates(locationRequest,locationCallback, Looper.myLooper())
 
         loadAvailableNurse()
+
+        homeViewModel.createToken()
     }
 
     private fun loadAvailableNurse() {
@@ -367,18 +369,16 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
     }
 
     private fun initListeners() {
-        homeViewModel.createToken()
-        // Verificar si map está inicializado antes de usarlo
         if (::map.isInitialized)  {
             // Configurar el listener del marcador solo si map está inicializado
             map.setOnMarkerClickListener { marker ->
                 val nurseID = marker.title
                 if (nurseID != null) {
+                    _binding!!.btnService.visibility = View.VISIBLE
                     lifecycleScope.launch {
-                        val nurseLocationService = homeViewModel.initialServiceNurse(nurseID)
-                        Log.d("nurseLocationService", "Datos ${nurseLocationService}")
+                        val nurseLocationService = homeViewModel.getLocationNurse(nurseID)
                         _binding!!.btnService.setOnClickListener {
-
+                            homeViewModel.initialService(nurseID, nurseLocationService, coordinates)
                             start = "${coordinates.longitude}, ${coordinates.latitude}"
                             end = "${nurseLocationService!!.longitude}, ${nurseLocationService!!
                             .latitude}"
