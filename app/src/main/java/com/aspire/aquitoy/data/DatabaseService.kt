@@ -3,6 +3,7 @@ package com.aspire.aquitoy.data
 import android.content.Context
 import android.util.Log
 import com.aspire.aquitoy.common.common
+import com.aspire.aquitoy.ui.requests.model.ServiceInfo
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.Task
 import com.google.firebase.database.DataSnapshot
@@ -142,4 +143,30 @@ class DatabaseService @Inject constructor(private val firebaseClient: FirebaseCl
 
         return state
     }
+
+    fun getAllServices(callback: (List<ServiceInfo>?, Throwable?) -> Unit) {
+        val patientID = firebaseClient.auth.currentUser!!.uid
+        val serviceInfoRef = firebaseClient.db_rt.child(common.SERVICE_INFO_REFERENCE)
+        val query = serviceInfoRef.orderByChild("patientID").equalTo(patientID)
+
+        query.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val serviceList = mutableListOf<ServiceInfo>()
+                for (dataSnapshot in snapshot.children) {
+                    val serviceInfo = dataSnapshot.getValue(ServiceInfo::class.java)
+                    serviceInfo?.let {
+                        it.serviceID = dataSnapshot.key ?: "" // Asigna el key como serviceID
+                        serviceList.add(it)
+                    }
+                }
+                callback(serviceList, null)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                callback(null, error.toException())
+            }
+        })
+    }
+
+
 }
