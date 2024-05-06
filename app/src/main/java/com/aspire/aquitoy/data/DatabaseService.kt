@@ -7,6 +7,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.Task
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.Query
 import com.google.firebase.database.ValueEventListener
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -18,9 +19,12 @@ import kotlin.coroutines.suspendCoroutine
 @Singleton
 class DatabaseService @Inject constructor(private val firebaseClient: FirebaseClient,
                                           @ApplicationContext private val context: Context) {
+
+    private var state = true
+
     suspend fun getLocationNurse(nurseID: String): LatLng? {
         return suspendCoroutine { continuation ->
-            val nurseLocationRef = firebaseClient.db_rt.child(common.NURSE_LOCATION_REFERENCES)
+            val nurseLocationRef = firebaseClient.db_rt.child(common.NURSE_LOCATION_REFERENCE)
             nurseLocationRef.child(nurseID).get().addOnSuccessListener { dataSnapshot ->
                 val locationArray = dataSnapshot.child("l").children.toList()
                 if (locationArray.size >= 2) {
@@ -58,7 +62,7 @@ class DatabaseService @Inject constructor(private val firebaseClient: FirebaseCl
     }
 
     fun checkIdService(serviceId: String): Boolean {
-        val serviceIdsRef = firebaseClient.db_rt.child(common.SERVICE_INFO_REFERENCES)
+        val serviceIdsRef = firebaseClient.db_rt.child(common.SERVICE_INFO_REFERENCE)
         var isUsed = false
 
         // Realizar consulta en la base de datos
@@ -78,5 +82,64 @@ class DatabaseService @Inject constructor(private val firebaseClient: FirebaseCl
             }
         })
         return isUsed
+    }
+
+    fun getService(): Query {
+        val patientID = firebaseClient.auth.currentUser!!.uid
+        val serviceInfoRef  = firebaseClient.db_rt.child(common.SERVICE_INFO_REFERENCE)
+        val query = serviceInfoRef.orderByChild("patientID").equalTo(patientID)
+
+        return query
+    }
+
+    fun updateState(asset : Boolean): Task<Void> {
+        val patientID = firebaseClient.auth.currentUser!!.uid
+        val patientInfoRef = firebaseClient.db_rt.child(common.PATIENT_INFO_REFERENCE)
+        return patientInfoRef.child(patientID).child("state").setValue(asset).addOnFailureListener {
+                exception ->
+            Log.d("REALTIMEDATABASE", "ERROR: ${exception.message}")
+        }
+    }
+
+    fun deleteService(serviceID: String?): Task<Void> {
+        val serviceInfoRef = firebaseClient.db_rt.child(common.SERVICE_INFO_REFERENCE)
+        val query = serviceInfoRef.child(serviceID!!).removeValue()
+
+        return query
+    }
+
+    fun checkStateNurse(nurseID: String): Boolean {
+        val nurseInfoRef = firebaseClient.db_rt.child(common.NURSE_INFO_REFERENCES)
+        val stateNurse = nurseInfoRef.child(nurseID).child("state")
+
+        stateNurse.get().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val result = task.result
+                val stateBD: Boolean = result?.getValue(Boolean::class.java) ?: false
+                state = stateBD
+            } else {
+                Log.d("STATE", "NO OBTENIDO")
+            }
+        }
+
+        return state
+    }
+
+    fun checkStatePatient(): Boolean {
+        val patientID = firebaseClient.auth.currentUser!!.uid
+        val patientInfoRef = firebaseClient.db_rt.child(common.PATIENT_INFO_REFERENCE)
+        val statePatient = patientInfoRef.child(patientID).child("state")
+
+        statePatient.get().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val result = task.result
+                val stateBD: Boolean = result?.getValue(Boolean::class.java) ?: false
+                state = stateBD
+            } else {
+                Log.d("STATE", "NO OBTENIDO")
+            }
+        }
+
+        return state
     }
 }

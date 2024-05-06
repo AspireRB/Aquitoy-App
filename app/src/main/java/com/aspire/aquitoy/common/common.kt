@@ -8,6 +8,6 @@ object common {
     val nurseFound: MutableSet<NurseGeoModel> = HashSet<NurseGeoModel>()
     val PATIENT_INFO_REFERENCE: String = "/PatientInfo"
     val NURSE_INFO_REFERENCES: String = "/NurseInfo"
-    val NURSE_LOCATION_REFERENCES: String = "/NurseLocation"
-    val SERVICE_INFO_REFERENCES: String = "/ServiceInfo"
+    val NURSE_LOCATION_REFERENCE: String = "/NurseLocation"
+    val SERVICE_INFO_REFERENCE: String = "/ServiceInfo"
 }

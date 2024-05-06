@@ -10,10 +10,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.aspire.aquitoy.R
 import com.aspire.aquitoy.common.common
 import com.aspire.aquitoy.data.ApiService
@@ -58,6 +62,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -81,6 +87,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
 
     //Routes
     private var coordinates: LatLng = LatLng(0.0, 0.0)
+    private var coordinatesNurse: LatLng = LatLng(0.0, 0.0)
     private var start: String = ""
     private var end: String = ""
 
@@ -98,6 +105,12 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
     lateinit var iFirebaseNurseInfoListener: FirebaseNurseInfoListener
     lateinit var iFirebaseFailedListener: FirebaseFailedListener
 
+    //Loading
+    private var _isLoading = MutableStateFlow<Boolean>(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
+    private var serviceId: String = ""
+
     override fun onDestroy() {
         fusedLocationProviderClient.removeLocationUpdates(locationCallback)
         super.onDestroy()
@@ -110,7 +123,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
 
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap!!
-
         Dexter.withContext(requireContext())
             .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
             .withListener(object: PermissionListener{
@@ -172,8 +184,19 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
 
         createMapFragment()
         init()
+        initUIState()
 
         return root
+    }
+
+    private fun initUIState() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                isLoading.collect {
+                    _binding!!.pbLoading.isVisible = it
+                }
+            }
+        }
     }
 
     private fun init() {
@@ -246,7 +269,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
                 //Load all nurses
                 try {
                     //Query
-                    val nurse_location_ref = FirebaseDatabase.getInstance().getReference(common.NURSE_LOCATION_REFERENCES)
+                    val nurse_location_ref = FirebaseDatabase.getInstance().getReference(common.NURSE_LOCATION_REFERENCE)
                     val geoFire = GeoFire(nurse_location_ref)
                     val geoQuery = geoFire.queryAtLocation(GeoLocation(location.latitude,location
                         .longitude),distance)
@@ -346,7 +369,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
 
     private fun findNurseByKey(nurseGeoModel: NurseGeoModel?) {
         FirebaseDatabase.getInstance()
-            .getReference(common.NURSE_LOCATION_REFERENCES)
+            .getReference(common.NURSE_LOCATION_REFERENCE)
             .child(nurseGeoModel!!.key!!)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
@@ -374,22 +397,22 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
             map.setOnMarkerClickListener { marker ->
                 val nurseID = marker.title
                 if (nurseID != null) {
-                    _binding!!.btnService.visibility = View.VISIBLE
-                    lifecycleScope.launch {
-                        val nurseLocationService = homeViewModel.getLocationNurse(nurseID)
-                        _binding!!.btnService.setOnClickListener {
-                            homeViewModel.initialService(nurseID, nurseLocationService, coordinates)
-                            start = "${coordinates.longitude}, ${coordinates.latitude}"
-                            end = "${nurseLocationService!!.longitude}, ${nurseLocationService!!
-                            .latitude}"
-                            poly?.remove()
-                            if (poly != null) {
-                                poly = null
-                            }
-                            if (::map.isInitialized) {
-                                createRoute()
+                    val checkState = homeViewModel.checkState(nurseID!!)
+                    if (checkState == true) {
+                        _binding!!.btnService.visibility = View.VISIBLE
+                        lifecycleScope.launch {
+                            val nurseLocationService = homeViewModel.getLocationNurse(nurseID)
+                            _binding!!.btnService.setOnClickListener {
+                                coordinatesNurse = nurseLocationService!!
+                                homeViewModel.initialService(nurseID, nurseLocationService, coordinates)
+                                _isLoading.value = true
+                                getService(nurseLocationService)
+                                Toast.makeText(context, "Esperando respuesta", Toast.LENGTH_SHORT).show()
+                                _binding!!.btnService.visibility = View.INVISIBLE
                             }
                         }
+                    } else {
+                        Toast.makeText(context, "No disponible", Toast.LENGTH_SHORT).show()
                     }
                 } else {
                     Log.d("nurseID", "Falla")
@@ -398,6 +421,47 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
             }
         } else {
             Log.d("Map", "El mapa no está inicializado aún")
+        }
+    }
+
+    fun getService(nurseLocationService: LatLng?) {
+        homeViewModel.getService()
+        homeViewModel.serviceInfoLiveData.observe(viewLifecycleOwner) { serviceInfoModel ->
+            if (serviceInfoModel.state == "accept") {
+                _isLoading.value = false
+                homeViewModel.updateState(false)
+                serviceId = serviceInfoModel.serviceID!!
+                fusedLocationProviderClient.removeLocationUpdates(locationCallback)
+                start = "${coordinates.longitude}, ${coordinates.latitude}"
+                end = "${nurseLocationService!!.longitude}, ${nurseLocationService!!
+                    .latitude}"
+                map.clear()
+                poly?.remove()
+                if (poly != null) {
+                    poly = null
+                }
+                if (::map.isInitialized) {
+                    map.addMarker(MarkerOptions()
+                        .position(LatLng(nurseLocationService.latitude, nurseLocationService
+                            .longitude))
+                        .flat(true)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_nurse)))
+                    createRoute()
+                }
+            } else if (serviceInfoModel.state == "decline") {
+                _isLoading.value = false
+                homeViewModel.deleteService(serviceInfoModel.serviceID)
+            }
+
+            if (serviceId == serviceInfoModel.serviceID) {
+                if (serviceInfoModel.state == "finalized") {
+                    homeViewModel.updateState(true)
+                    poly?.remove()
+                    map.clear()
+                    Toast.makeText(context, "Servicio finalizado", Toast.LENGTH_SHORT).show()
+                    loadAvailableNurse()
+                }
+            }
         }
     }
 
@@ -450,7 +514,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
         }
 
         val nurseLocation = FirebaseDatabase.getInstance()
-            .getReference(common.NURSE_LOCATION_REFERENCES)
+            .getReference(common.NURSE_LOCATION_REFERENCE)
             .child(nurseGeoModel!!.key!!)
         nurseLocation.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
