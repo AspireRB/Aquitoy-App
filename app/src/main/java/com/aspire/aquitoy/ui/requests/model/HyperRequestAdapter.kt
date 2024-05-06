@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
-import com.aspire.aquitoy.R
+import com.aspire.aquitoy.databinding.ItemsHistoryBinding
 
 class HyperRequestAdapter(private val hyperServiceList: LiveData<List<ServiceInfo>>) : RecyclerView
 .Adapter<HyperRequestViewHolder>()
@@ -19,9 +19,10 @@ class HyperRequestAdapter(private val hyperServiceList: LiveData<List<ServiceInf
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HyperRequestViewHolder {
-        val layoutInflater = LayoutInflater.from(parent.context)
-        return HyperRequestViewHolder(layoutInflater.inflate(R.layout.items_history, parent, false))
+        val binding = ItemsHistoryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return HyperRequestViewHolder(binding, parent.context)
     }
+
 
     override fun getItemCount(): Int {
         return items.size
