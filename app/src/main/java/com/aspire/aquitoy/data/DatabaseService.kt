@@ -3,6 +3,7 @@ package com.aspire.aquitoy.data
 import android.content.Context
 import android.util.Log
 import com.aspire.aquitoy.common.common
+import com.aspire.aquitoy.ui.profile.model.UserInfo
 import com.aspire.aquitoy.ui.requests.model.ServiceInfo
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.Task
@@ -168,5 +169,32 @@ class DatabaseService @Inject constructor(private val firebaseClient: FirebaseCl
         })
     }
 
+    fun getInfoUser(callback: (UserInfo?, Throwable?) -> Unit) {
+        val currentUser = firebaseClient.auth.currentUser!!.uid
+        val currentUserInfoRef = firebaseClient.db_rt.child(common.PATIENT_INFO_REFERENCE)
+        currentUserInfoRef.child(currentUser).get().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val dataSnapshot = task.result
+                if (dataSnapshot != null && dataSnapshot.exists()) {
+                    // Obtener los valores de la base de datos
+                    val reaName = dataSnapshot.child("realName").getValue(String::class.java)
+                    val email = dataSnapshot.child("email").getValue(String::class.java)
+                    val rol = dataSnapshot.child("rol").getValue(String::class.java)
+                    // Otros campos...
 
+                    // Crear un objeto de modelo de datos con la información obtenida
+                    val userInfo = UserInfo(reaName!!, email!!, rol!!)
+
+                    // Devolver la información al llamador
+                    callback(userInfo, null)
+                } else {
+                    // Manejar el caso donde los datos no existen
+                    callback(null, Throwable("Data not found"))
+                }
+            } else {
+                // Manejar el error
+                callback(null, task.exception)
+            }
+        }
+    }
 }
