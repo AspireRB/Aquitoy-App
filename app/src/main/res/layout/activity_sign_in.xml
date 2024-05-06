@@ -46,24 +46,11 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
             app:layout_constraintBottom_toTopOf="@+id/btnCreateAccount"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/viewHeader">
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilNickname"
-                style="@style/FormTextInputLayout"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                app:layout_constraintBottom_toTopOf="@+id/tilRealName"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-
-            </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilRealName"
@@ -74,7 +61,7 @@
                 app:layout_constraintBottom_toTopOf="@+id/tilEmail"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tilNickname">
+                app:layout_constraintTop_toBottomOf="@+id/tilEmail">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etRealName"
@@ -119,7 +106,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                app:layout_constraintBottom_toTopOf="@+id/tilRepeatPassword"
+                app:layout_constraintBottom_toTopOf="@+id/btnCreateAccount"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tilEmail">
@@ -130,24 +117,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/signin_form_password"
-                    android:imeOptions="actionNext"
+                    android:imeOptions="actionDone"
                     android:inputType="textPassword"
                     android:textColorHighlight="@color/error_dark"
                     android:textColorHint="@color/error_dark" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilRepeatPassword"
-                style="@style/FormTextInputLayout"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                app:layout_constraintBottom_toTopOf="@+id/btnCreateAccount"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tilPassword">
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -162,7 +135,7 @@
                 app:layout_constraintBottom_toTopOf="@+id/viewBottom"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tilRepeatPassword" />
+                app:layout_constraintTop_toBottomOf="@+id/tilPassword" />
 
             <include
                 android:id="@+id/viewBottom"

@@ -51,7 +51,6 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etEmail"
-            android:text="dlopez+jobb@gmail.com"
             style="@style/FormEditText"
             android:layout_width="375dp"
             android:layout_height="match_parent"
@@ -75,7 +74,6 @@
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etPassword"
             style="@style/FormEditText"
-            android:text="qwerty123456"
             android:layout_width="375dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -87,16 +85,16 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvForgotPassword"
-        style="@style/TertiaryButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="16dp"
-        android:text="@string/login_forgot_password"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tilPassword" />
+<!--    <androidx.appcompat.widget.AppCompatTextView-->
+<!--        android:id="@+id/tvForgotPassword"-->
+<!--        style="@style/TertiaryButton"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginHorizontal="16dp"-->
+<!--        android:layout_marginTop="16dp"-->
+<!--        android:text="@string/login_forgot_password"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/tilPassword" />-->
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnLogin"
@@ -108,7 +106,7 @@
         android:text="@string/login_button_loggin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvForgotPassword" />
+        app:layout_constraintTop_toBottomOf="@+id/tilPassword" />
 
     <ProgressBar
         android:id="@+id/pbLoading"
