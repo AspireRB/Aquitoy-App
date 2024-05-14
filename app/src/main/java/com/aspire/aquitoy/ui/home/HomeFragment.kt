@@ -171,6 +171,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
 
             })
             .check()
+        initListeners()
     }
 
     override fun onCreateView(
@@ -330,7 +331,11 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
                                     loadAvailableNurse()
                                 } else {
                                     distance = 0.0
-                                    addNurseMarker()
+                                    if (_binding != null) {
+                                        addNurseMarker()
+                                    } else {
+                                        Log.d("HomeFragment", "La vista no está disponible aún")
+                                    }
                                 }
                             }
 
@@ -350,7 +355,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
                     Log.d("LoadNurse", "Nurse null")
                 }
             }
-        initListeners()
     }
 
     private fun addNurseMarker() {
