@@ -16,7 +16,7 @@
         app:icon="@drawable/ic_arrow"
         app:iconGravity="textEnd"
         app:iconTint="@color/background"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/formView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.041"
         app:layout_constraintStart_toStartOf="parent"
@@ -24,11 +24,13 @@
         app:layout_constraintVertical_bias="0.023" />
 
     <ScrollView
+        android:id="@+id/formView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingStart="20dp"
         android:paddingEnd="20dp"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="60dp"
+        app:layout_constraintTop_toTopOf="@id/btnBack"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
@@ -104,7 +106,7 @@
                     android:layout_width="wrap_content"
                     style="@style/BodyText"
                     android:layout_height="wrap_content"
-                    android:text="Fecha: "/>
+                    android:text="Fecha de nacimiento: "/>
                 <TextView
                     android:id="@+id/textViewFecha"
                     android:layout_width="wrap_content"
@@ -148,7 +150,7 @@
                     android:layout_width="wrap_content"
                     style="@style/BodyText"
                     android:layout_height="wrap_content"
-                    android:text="Cedula: "/>
+                    android:text="Tarjeta profesional: "/>
                 <TextView
                     android:id="@+id/textViewCedulaNurse"
                     android:layout_width="wrap_content"
@@ -156,18 +158,18 @@
                     android:textSize="18sp"
                     android:padding="16dp"/>
             </LinearLayout>
-            <!-- Antecedentes médicos -->
+            <!-- Diagnostico -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 style="@style/TitleText"
                 android:layout_marginBottom="8dp"
-                android:text="Antecedentes médicos"
+                android:text="Diagnostico"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/textViewMedicalHistory"
+                android:id="@+id/textViewMedicalDiagnosis"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="18sp"
@@ -178,12 +180,28 @@
                 android:layout_height="wrap_content"
                 style="@style/TitleText"
                 android:layout_marginBottom="8dp"
-                android:text="Medicamenos actuales"
+                android:text="Medicamentos actuales"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/editTextCurrentMedications"
+                android:id="@+id/textViewCurrentMedications"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:padding="16dp"/>
+            <!-- Antecedentes medicos -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/TitleText"
+                android:layout_marginBottom="8dp"
+                android:text="Antecedentes y discapacidad"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/textViewMedicalHistory"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="18sp"

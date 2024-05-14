@@ -14,8 +14,9 @@ class RequestActivity : AppCompatActivity() {
     private lateinit var textViewFecha: TextView
     private lateinit var textViewNameNurse: TextView
     private lateinit var textViewCedulaNurse: TextView
+    private lateinit var textViewMedicalDiagnosis: TextView
+    private lateinit var textViewCurrentMedications: TextView
     private lateinit var textViewMedicalHistory: TextView
-    private lateinit var editTextCurrentMedications: TextView
     private lateinit var btnBack: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,11 +27,12 @@ class RequestActivity : AppCompatActivity() {
         val patientName = intent.getStringExtra("patientName")
         val patientAge = intent.getStringExtra("patientAge")
         val patientCedula = intent.getStringExtra("patientCedula")
-        val fecha = intent.getStringExtra("fecha")
+        val fecha = intent.getStringExtra("patientFechaNacimiento")
         val nurseName = intent.getStringExtra("nurseName")
-        val nurseCedula = intent.getStringExtra("nurseCedula")
-        val medicalHistory = intent.getStringExtra("medicalHistory")
+        val nurseTarjeta = intent.getStringExtra("nurseTarjeta")
+        val medicalDiagnosis = intent.getStringExtra("medicalDiagnosis")
         val currentMedications = intent.getStringExtra("currentMedications")
+        val medicalHistory = intent.getStringExtra("medicalHistory")
 
         // Inicializar las vistas
         textViewName = findViewById(R.id.textViewName)
@@ -39,8 +41,9 @@ class RequestActivity : AppCompatActivity() {
         textViewFecha = findViewById(R.id.textViewFecha)
         textViewNameNurse = findViewById(R.id.textViewNameNurse)
         textViewCedulaNurse = findViewById(R.id.textViewCedulaNurse)
+        textViewMedicalDiagnosis = findViewById(R.id.textViewMedicalDiagnosis)
+        textViewCurrentMedications = findViewById(R.id.textViewCurrentMedications)
         textViewMedicalHistory = findViewById(R.id.textViewMedicalHistory)
-        editTextCurrentMedications = findViewById(R.id.editTextCurrentMedications)
 
         // Mostrar los datos en las vistas
         textViewName.text = patientName
@@ -48,9 +51,10 @@ class RequestActivity : AppCompatActivity() {
         textViewCedula.text = patientCedula
         textViewFecha.text = fecha
         textViewNameNurse.text = nurseName
-        textViewCedulaNurse.text = nurseCedula
+        textViewCedulaNurse.text = nurseTarjeta
+        textViewMedicalDiagnosis.text = medicalDiagnosis
+        textViewCurrentMedications.text = currentMedications
         textViewMedicalHistory.text = medicalHistory
-        editTextCurrentMedications.text = currentMedications
         // Agrega aquí más asignaciones para mostrar toda la información del servicio
 
         btnBack = findViewById(R.id.btnBack)

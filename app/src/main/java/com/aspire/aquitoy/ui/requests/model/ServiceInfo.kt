@@ -12,18 +12,20 @@ data class ServiceInfo(
     val patientID: String = "",
     val patientLocationService: String = "",
     var state: String = "",
+    val fecha: String = "",
     val patientName: String = "",
     val patientAge: String = "",
     val patientCedula: String = "",
-    val fecha: String = "",
+    val patientFechaNacimiento: String = "",
     val nurseName: String = "",
-    val nurseCedula: String = "",
-    val medicalHistory: String = "",
-    val currentMedications: String = ""
+    val nurseTarjeta: String = "",
+    val medicalDiagnosis: String = "",
+    val currentMedications: String = "",
+    val medicalHistory: String = ""
 ) : Parcelable {
 
     // Constructor sin argumentos necesario para Firebase Database
-    constructor() : this("", "", "", "", "", "", "", "", "", "", "", "", "", "")
+    constructor() : this("", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "")
 
     // Para excluir la propiedad serviceID de la serialización a Firebase
     @Exclude
@@ -34,14 +36,16 @@ data class ServiceInfo(
             "patientID" to patientID,
             "patientLocationService" to patientLocationService,
             "state" to state,
+            "fecha" to fecha,
             "patientName" to patientName,
             "patientAge" to patientAge,
             "patientCedula" to patientCedula,
-            "fecha" to fecha,
+            "patientFechaNacimiento" to patientFechaNacimiento,
             "nurseName" to nurseName,
-            "nurseCedula" to nurseCedula,
-            "medicalHistory" to medicalHistory,
-            "currentMedications" to currentMedications
+            "nurseTarjeta" to nurseTarjeta,
+            "medicalDiagnosis" to medicalDiagnosis,
+            "currentMedications" to currentMedications,
+            "medicalHistory" to medicalHistory
         )
     }
 }

@@ -18,11 +18,12 @@ class HyperRequestViewHolder(private val binding: ItemsHistoryBinding, private v
             intent.putExtra("patientName", serviceInfo.patientName)
             intent.putExtra("patientAge", serviceInfo.patientAge)
             intent.putExtra("patientCedula", serviceInfo.patientCedula)
-            intent.putExtra("fecha", serviceInfo.fecha)
+            intent.putExtra("patientFechaNacimiento", serviceInfo.patientFechaNacimiento)
             intent.putExtra("nurseName", serviceInfo.nurseName)
-            intent.putExtra("nurseCedula", serviceInfo.nurseCedula)
-            intent.putExtra("medicalHistory", serviceInfo.medicalHistory)
+            intent.putExtra("nurseTarjeta", serviceInfo.nurseTarjeta)
+            intent.putExtra("medicalDiagnosis", serviceInfo.medicalDiagnosis)
             intent.putExtra("currentMedications", serviceInfo.currentMedications)
+            intent.putExtra("medicalHistory", serviceInfo.medicalHistory)
             // Agrega aquí más extras según sea necesario para mostrar toda la información del servicio
             context.startActivity(intent)
         }

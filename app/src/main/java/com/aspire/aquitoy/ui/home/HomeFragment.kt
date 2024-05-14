@@ -266,83 +266,88 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
                 Snackbar.make(requireView(),e.message!!,Snackbar.LENGTH_SHORT).show()
             }
             .addOnSuccessListener { location ->
-                //Load all nurses
-                try {
-                    //Query
-                    val nurse_location_ref = FirebaseDatabase.getInstance().getReference(common.NURSE_LOCATION_REFERENCE)
-                    val geoFire = GeoFire(nurse_location_ref)
-                    val geoQuery = geoFire.queryAtLocation(GeoLocation(location.latitude,location
-                        .longitude),distance)
-                    geoQuery.removeAllListeners()
+                if (location != null) { // Add null check for location
+                    //Load all nurses
+                    try {
+                        //Query
+                        val nurse_location_ref = FirebaseDatabase.getInstance().getReference(common.NURSE_LOCATION_REFERENCE)
+                        val geoFire = GeoFire(nurse_location_ref)
+                        val geoQuery = geoFire.queryAtLocation(
+                            GeoLocation(location.latitude,location
+                            .longitude),distance)
+                        geoQuery.removeAllListeners()
 
-                    nurse_location_ref.addChildEventListener(object : ChildEventListener {
-                        override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                            val geoQueryModel = snapshot.getValue(GeoQueryModel::class.java)
-                            val geoLocation = GeoLocation(geoQueryModel!!.l!![0], geoQueryModel!!
-                                .l!![1])
-                            val nurseGeoModel = NurseGeoModel(snapshot.key,geoLocation)
-                            val newNurseLocation = Location("")
-                            newNurseLocation.latitude = geoLocation.latitude
-                            newNurseLocation.longitude = geoLocation.longitude
-                            val newDistance = location.distanceTo(newNurseLocation)/1000
-                            if(newDistance <= LIMIT_RANGE)
-                                findNurseByKey(nurseGeoModel)
-                        }
-
-                        override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-
-                        }
-
-                        override fun onChildRemoved(snapshot: DataSnapshot) {
-
-                        }
-
-                        override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-
-                        }
-
-                        override fun onCancelled(error: DatabaseError) {
-                            Snackbar.make(requireView(),error.message,Snackbar
-                                .LENGTH_SHORT)
-                                .show()
-                        }
-                    })
-
-                    geoQuery.addGeoQueryEventListener(object : GeoQueryEventListener {
-                        override fun onKeyEntered(key: String?, location: GeoLocation?) {
-                            common.nurseFound.add(NurseGeoModel(key!!,location!!))
-                            Log.d("nurseFound", "Tiene: ${common.nurseFound.size}")
-                        }
-
-                        override fun onKeyExited(key: String?) {
-
-                        }
-
-                        override fun onKeyMoved(key: String?, location: GeoLocation?) {
-
-                        }
-
-                        override fun onGeoQueryReady() {
-                            if (distance <= LIMIT_RANGE) {
-                                distance++
-                                loadAvailableNurse()
-                            } else {
-                                distance = 0.0
-                                addNurseMarker()
+                        nurse_location_ref.addChildEventListener(object : ChildEventListener {
+                            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                                val geoQueryModel = snapshot.getValue(GeoQueryModel::class.java)
+                                val geoLocation = GeoLocation(geoQueryModel!!.l!![0], geoQueryModel!!
+                                    .l!![1])
+                                val nurseGeoModel = NurseGeoModel(snapshot.key,geoLocation)
+                                val newNurseLocation = Location("")
+                                newNurseLocation.latitude = geoLocation.latitude
+                                newNurseLocation.longitude = geoLocation.longitude
+                                val newDistance = location.distanceTo(newNurseLocation)/1000
+                                if(newDistance <= LIMIT_RANGE)
+                                    findNurseByKey(nurseGeoModel)
                             }
-                        }
 
-                        override fun onGeoQueryError(error: DatabaseError?) {
-                            Snackbar.make(requireView(),error!!.message,Snackbar
-                                .LENGTH_SHORT)
-                                .show()
-                        }
-                    })
+                            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
 
-                } catch (e:IOException) {
-                    Snackbar.make(requireView(),getString(R.string.permission_require),Snackbar
-                        .LENGTH_SHORT)
-                        .show()
+                            }
+
+                            override fun onChildRemoved(snapshot: DataSnapshot) {
+
+                            }
+
+                            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+
+                            }
+
+                            override fun onCancelled(error: DatabaseError) {
+                                Snackbar.make(requireView(),error.message,Snackbar
+                                    .LENGTH_SHORT)
+                                    .show()
+                            }
+                        })
+
+                        geoQuery.addGeoQueryEventListener(object : GeoQueryEventListener {
+                            override fun onKeyEntered(key: String?, location: GeoLocation?) {
+                                common.nurseFound.add(NurseGeoModel(key!!,location!!))
+                                Log.d("nurseFound", "Tiene: ${common.nurseFound.size}")
+                            }
+
+                            override fun onKeyExited(key: String?) {
+
+                            }
+
+                            override fun onKeyMoved(key: String?, location: GeoLocation?) {
+
+                            }
+
+                            override fun onGeoQueryReady() {
+                                if (distance <= LIMIT_RANGE) {
+                                    distance++
+                                    loadAvailableNurse()
+                                } else {
+                                    distance = 0.0
+                                    addNurseMarker()
+                                }
+                            }
+
+                            override fun onGeoQueryError(error: DatabaseError?) {
+                                Snackbar.make(requireView(),error!!.message,Snackbar
+                                    .LENGTH_SHORT)
+                                    .show()
+                            }
+                        })
+
+                    } catch (e: IOException) {
+                        Snackbar.make(requireView(),getString(R.string.permission_require),Snackbar
+                            .LENGTH_SHORT)
+                            .show()
+                    }
+                } else {
+                    Log.d("LoadNurse", "Nurse null")
                 }
             }
         initListeners()
