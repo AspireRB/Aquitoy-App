@@ -1,5 +1,6 @@
 package com.aspire.aquitoy.ui.requests.model
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.LiveData
@@ -30,6 +31,7 @@ class HyperRequestAdapter(private val hyperServiceList: LiveData<List<ServiceInf
 
     override fun onBindViewHolder(holder: HyperRequestViewHolder, position: Int) {
         val item = items[position]
+        Log.d("ITEM", "${items[position]}")
         holder.render(item)
     }
 }

@@ -17,7 +17,8 @@ class RequestsViewModel @Inject constructor(private val databaseService: Databas
                 if (error != null) {
                     Log.d("REALTIME", "ERROR REQUEST")
                 } else {
-                    liveData.postValue(services)
+                    liveData.value = services
+                    Log.d("SERVICES_ALL", "${services}")
                 }
             }
         }
