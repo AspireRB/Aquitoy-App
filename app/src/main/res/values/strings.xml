@@ -66,8 +66,8 @@
 
     <string name="feature_not_allowed">Feature no solicitada :)</string>
     <string name="signin_button_createaccount">Crear mi cuenta</string>
-    <string name="permission_require">Permission Location required</string>
-    <string name="nurse_not_found">Nurse not found</string>
-    <string name="key_not_found">Key nurse not found</string>
+    <string name="permission_require">Permiso de localización requerido</string>
+    <string name="nurse_not_found">Enfermero no encontrado</string>
+    <string name="key_not_found">Llave de enfermero no encontrada</string>
     <string name="default_web_client_id">237440083921-v4llnkdlksv72qhfqki9t30kq2sm585v.apps.googleusercontent.com</string>
 </resources>
