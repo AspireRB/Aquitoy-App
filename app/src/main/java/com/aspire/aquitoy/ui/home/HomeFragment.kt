@@ -26,6 +26,7 @@ import com.aspire.aquitoy.ui.home.callback.FirebaseFailedListener
 import com.aspire.aquitoy.ui.home.callback.FirebaseNurseInfoListener
 import com.aspire.aquitoy.ui.home.model.GeoQueryModel
 import com.aspire.aquitoy.ui.home.model.NurseGeoModel
+import com.aspire.aquitoy.ui.home.model.NurseInfoModel
 import com.aspire.aquitoy.ui.home.model.RouteResponse
 import com.firebase.geofire.GeoFire
 import com.firebase.geofire.GeoLocation
@@ -94,7 +95,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
 
     //Load Nurse
     var distance = 1.0
-    val LIMIT_RANGE = 20000.0
+    val LIMIT_RANGE = 10.0
     var previousLocation: Location? = null
     var currentLocation: Location? = null
 
@@ -110,16 +111,46 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
 
     private var serviceId: String = ""
 
-    override fun onDestroy() {
+    private fun startLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+        fusedLocationProviderClient.requestLocationUpdates(
+            locationRequest,
+            locationCallback,
+            Looper.myLooper()
+        )
+    }
+
+    private fun stopLocationUpdates() {
         fusedLocationProviderClient.removeLocationUpdates(locationCallback)
+    }
+
+    override fun onPause() {
+        stopLocationUpdates()
+        super.onPause()
+    }
+
+    override fun onDestroy() {
+        stopLocationUpdates()
         super.onDestroy()
     }
 
     override fun onResume() {
-        init()
-        loadAvailableNurse()
         super.onResume()
+        if (::fusedLocationProviderClient.isInitialized && ::locationCallback.isInitialized) {
+            startLocationUpdates()
+            loadAvailableNurse()
+        }
     }
+
 
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap!!
@@ -279,15 +310,13 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
                         nurse_location_ref.addChildEventListener(object : ChildEventListener {
                             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                                 val geoQueryModel = snapshot.getValue(GeoQueryModel::class.java)
-                                val geoLocation = GeoLocation(geoQueryModel!!.l!![0], geoQueryModel!!
-                                    .l!![1])
-                                val nurseGeoModel = NurseGeoModel(snapshot.key,geoLocation)
-                                val newNurseLocation = Location("")
-                                newNurseLocation.latitude = geoLocation.latitude
-                                newNurseLocation.longitude = geoLocation.longitude
-                                val newDistance = location.distanceTo(newNurseLocation)/1000
-                                if(newDistance <= LIMIT_RANGE)
+                                val geoLocation = GeoLocation(geoQueryModel!!.l!![1], geoQueryModel!!.l!![0])
+                                val nurseGeoModel = NurseGeoModel(snapshot.key, geoLocation)
+
+                                val newDistance = calculateDistance(location.latitude, location.longitude, geoLocation.latitude, geoLocation.longitude)
+                                if (newDistance <= LIMIT_RANGE) {
                                     findNurseByKey(nurseGeoModel)
+                                }
                             }
 
                             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
@@ -309,21 +338,28 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
                             }
                         })
 
+                        Log.d("GeoQuery", "Starting geoQuery at location: (${location.latitude}, ${location.longitude}) with distance: $distance")
+
                         geoQuery.addGeoQueryEventListener(object : GeoQueryEventListener {
                             override fun onKeyEntered(key: String?, location: GeoLocation?) {
-                                common.nurseFound.add(NurseGeoModel(key!!,location!!))
-                                Log.d("nurseFound", "Tiene: ${common.nurseFound.size}")
+                                if (key != null && location != null) {
+                                    common.nurseFound.add(NurseGeoModel(key, location))
+                                    Log.d("nurseFound", "Tiene: ${common.nurseFound.size}")
+                                } else {
+                                    Log.e("GeoQuery", "Key or location is null. Key: $key, Location: $location")
+                                }
                             }
 
                             override fun onKeyExited(key: String?) {
-
+                                Log.d("GeoQuery", "onKeyExited called with Key: $key")
                             }
 
                             override fun onKeyMoved(key: String?, location: GeoLocation?) {
-
+                                Log.d("GeoQuery", "onKeyMoved called with Key: $key, Location: $location")
                             }
 
                             override fun onGeoQueryReady() {
+                                Log.d("GeoQuery", "onGeoQueryReady called")
                                 if (distance <= LIMIT_RANGE) {
                                     distance++
                                     loadAvailableNurse()
@@ -338,12 +374,12 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
                             }
 
                             override fun onGeoQueryError(error: DatabaseError?) {
+                                Log.e("GeoQuery", "Error: ${error!!.message}")
                                 Snackbar.make(requireView(),error!!.message,Snackbar
                                     .LENGTH_SHORT)
                                     .show()
                             }
                         })
-
                     } catch (e: IOException) {
                         Snackbar.make(requireView(),getString(R.string.permission_require),Snackbar
                             .LENGTH_SHORT)
@@ -353,6 +389,17 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
                     Log.d("LoadNurse", "Nurse null")
                 }
             }
+    }
+
+    private fun calculateDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
+        val R = 6371.0 // Radius of the Earth in kilometers
+        val dLat = Math.toRadians(lat2 - lat1)
+        val dLon = Math.toRadians(lon2 - lon1)
+        val a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2)
+        val c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+        return R * c
     }
 
     private fun addNurseMarker() {
@@ -368,30 +415,45 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
                         .LENGTH_SHORT).show()
                     }
                 )
-        } else {
-            Snackbar.make(requireView(), getString(R.string.nurse_not_found), Snackbar
-                .LENGTH_SHORT).show()
         }
     }
 
     private fun findNurseByKey(nurseGeoModel: NurseGeoModel?) {
+        if (nurseGeoModel == null || nurseGeoModel.key == null) {
+            Log.e("findNurseByKey", "NurseGeoModel or key is null")
+            return
+        }
+
+        Log.d("findNurseByKey", "Searching for nurse with key: ${nurseGeoModel.key}")
+
         FirebaseDatabase.getInstance()
-            .getReference(common.NURSE_LOCATION_REFERENCE)
-            .child(nurseGeoModel!!.key!!)
+            .getReference(common.NURSE_INFO_REFERENCES) // Asegúrate de que esta referencia sea
+            // correcta
+            .child(nurseGeoModel.key!!)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    if (snapshot.hasChildren()) {
-                        iFirebaseNurseInfoListener.onNurseInfoLoadSuccess(nurseGeoModel)
+                    if (snapshot.exists()) {
+                        val nurseInfo = snapshot.getValue(NurseInfoModel::class.java)
+                        if (nurseInfo != null) {
+                            Log.d("findNurseByKey", "Nurse data found: $nurseInfo")
+                            nurseGeoModel.nurseInfo = nurseInfo
+                            iFirebaseNurseInfoListener.onNurseInfoLoadSuccess(nurseGeoModel)
+                        } else {
+                            Log.e("findNurseByKey", "Nurse data is null for key: ${nurseGeoModel.key}")
+                        }
+                    } else {
+                        Log.e("findNurseByKey", "No data exists for key: ${nurseGeoModel.key}")
+                        iFirebaseFailedListener.onFirebaseFailed(getString(R.string.key_not_found) + nurseGeoModel.key)
                     }
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    iFirebaseFailedListener.onFirebaseFailed(getString(R.string.key_not_found)
-                            +nurseGeoModel.key)
+                    Log.e("findNurseByKey", "Firebase error: ${error.message}")
+                    iFirebaseFailedListener.onFirebaseFailed(getString(R.string.key_not_found) + nurseGeoModel.key)
                 }
-
             })
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -520,10 +582,9 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
     override fun onNurseInfoLoadSuccess(nurseGeoModel: NurseGeoModel?) {
         if (!common.markerList.containsKey(nurseGeoModel!!.key)) {
             val marker = map.addMarker(MarkerOptions()
-                .position(LatLng(nurseGeoModel!!.geoLocation!!.longitude, nurseGeoModel!!
-                    .geoLocation!!.latitude))
+                .position(LatLng(nurseGeoModel!!.geoLocation!!.latitude, nurseGeoModel!!
+                    .geoLocation!!.longitude))
                 .flat(true)
-                //.title(common.buildName(nurseGeoModel.nurseInfoModel!!.realName))
                 .title(nurseGeoModel.key)
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_nurse)))
             if (marker != null) {  // Check if marker is not null
