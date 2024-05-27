@@ -87,7 +87,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
 
     //Routes
     private var coordinates: LatLng = LatLng(0.0, 0.0)
-    private var coordinatesNurse: LatLng = LatLng(0.0, 0.0)
     private var start: String = ""
     private var end: String = ""
 
@@ -117,6 +116,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
     }
 
     override fun onResume() {
+        init()
         loadAvailableNurse()
         super.onResume()
     }
@@ -247,8 +247,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
         fusedLocationProviderClient.requestLocationUpdates(locationRequest,locationCallback, Looper.myLooper())
 
         loadAvailableNurse()
-
-        homeViewModel.createToken()
     }
 
     private fun loadAvailableNurse() {
@@ -402,20 +400,20 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
 
     private fun initListeners() {
         if (::map.isInitialized)  {
+            getService()
             // Configurar el listener del marcador solo si map está inicializado
             map.setOnMarkerClickListener { marker ->
                 val nurseID = marker.title
+                var checkState = homeViewModel.checkState(nurseID!!)
                 if (nurseID != null) {
-                    val checkState = homeViewModel.checkState(nurseID!!)
+                    checkState = homeViewModel.checkState(nurseID!!)
                     if (checkState == true) {
                         _binding!!.btnService.visibility = View.VISIBLE
                         lifecycleScope.launch {
-                            val nurseLocationService = homeViewModel.getLocationNurse(nurseID)
                             _binding!!.btnService.setOnClickListener {
-                                coordinatesNurse = nurseLocationService!!
-                                homeViewModel.initialService(nurseID, nurseLocationService, coordinates)
+                                homeViewModel.initialService(nurseID, coordinates)
                                 _isLoading.value = true
-                                getService(nurseLocationService)
+                                getService()
                                 Toast.makeText(context, "Esperando respuesta", Toast.LENGTH_SHORT).show()
                                 _binding!!.btnService.visibility = View.INVISIBLE
                             }
@@ -433,42 +431,53 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
         }
     }
 
-    fun getService(nurseLocationService: LatLng?) {
+    fun getService() {
         homeViewModel.getService()
-        homeViewModel.serviceInfoLiveData.observe(viewLifecycleOwner) { serviceInfoModel ->
-            if (serviceInfoModel.state == "accept") {
-                _isLoading.value = false
-                homeViewModel.updateState(false)
-                serviceId = serviceInfoModel.serviceID!!
-                fusedLocationProviderClient.removeLocationUpdates(locationCallback)
-                start = "${coordinates.longitude}, ${coordinates.latitude}"
-                end = "${nurseLocationService!!.longitude}, ${nurseLocationService!!
-                    .latitude}"
-                map.clear()
-                poly?.remove()
-                if (poly != null) {
-                    poly = null
+        homeViewModel.serviceInfoListLiveData.observe(viewLifecycleOwner) { serviceInfoList ->
+            serviceInfoList.forEach { serviceInfoModel ->
+                Log.d("SERVICE","${serviceInfoModel.copy()}")
+                homeViewModel.getLocationNurse(serviceInfoModel.nurseID!!) { nurseLocationService ->
+                    if (serviceInfoModel.state == "accept") {
+                        _isLoading.value = false
+                        homeViewModel.updateState(false)
+                        serviceId = serviceInfoModel.serviceID!!
+                        fusedLocationProviderClient.removeLocationUpdates(locationCallback)
+                        start = "${coordinates.longitude}, ${coordinates.latitude}"
+                        end = "${nurseLocationService!!.longitude}, ${nurseLocationService!!
+                            .latitude}"
+                        map.clear()
+                        poly?.remove()
+                        if (poly != null) {
+                            poly = null
+                        }
+                        if (::map.isInitialized) {
+                            map.addMarker(MarkerOptions()
+                                .position(LatLng(nurseLocationService.latitude, nurseLocationService
+                                    .longitude))
+                                .flat(true)
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_nurse)))
+                            createRoute()
+                        }
+                    }
                 }
-                if (::map.isInitialized) {
-                    map.addMarker(MarkerOptions()
-                        .position(LatLng(nurseLocationService.latitude, nurseLocationService
-                            .longitude))
-                        .flat(true)
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_nurse)))
-                    createRoute()
-                }
-            } else if (serviceInfoModel.state == "decline") {
-                _isLoading.value = false
-                homeViewModel.deleteService(serviceInfoModel.serviceID)
-            }
 
-            if (serviceId == serviceInfoModel.serviceID) {
-                if (serviceInfoModel.state == "finalized") {
-                    homeViewModel.updateState(true)
-                    poly?.remove()
-                    map.clear()
-                    Toast.makeText(context, "Servicio finalizado", Toast.LENGTH_SHORT).show()
-                    loadAvailableNurse()
+                if (serviceInfoModel.state == "decline") {
+                    _isLoading.value = false
+                    homeViewModel.deleteService(serviceInfoModel.serviceID)
+                }
+
+                if (serviceId == serviceInfoModel.serviceID) {
+                    if (serviceInfoModel.state == "finalized") {
+                        val state = homeViewModel.getState()
+                        if (state != true) {
+                            homeViewModel.updateState(true)
+                            poly?.remove()
+                            map.clear()
+                            Toast.makeText(context, "Servicio finalizado", Toast.LENGTH_SHORT).show()
+                            init()
+                            loadAvailableNurse()
+                        }
+                    }
                 }
             }
         }

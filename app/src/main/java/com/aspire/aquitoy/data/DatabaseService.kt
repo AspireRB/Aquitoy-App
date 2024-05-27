@@ -14,40 +14,36 @@ import com.google.firebase.database.ValueEventListener
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
 
 @Singleton
 class DatabaseService @Inject constructor(private val firebaseClient: FirebaseClient,
                                           @ApplicationContext private val context: Context) {
 
     private var state = true
+    private var stateUser = false
 
-    suspend fun getLocationNurse(nurseID: String): LatLng? {
-        return suspendCoroutine { continuation ->
-            val nurseLocationRef = firebaseClient.db_rt.child(common.NURSE_LOCATION_REFERENCE)
-            nurseLocationRef.child(nurseID).get().addOnSuccessListener { dataSnapshot ->
-                val locationArray = dataSnapshot.child("l").children.toList()
-                if (locationArray.size >= 2) {
-                    val latitude = locationArray[1].getValue(Double::class.java)
-                    val longitude = locationArray[0].getValue(Double::class.java)
-                    if (latitude != null && longitude != null) {
-                        val location = LatLng(latitude, longitude)
-                        Log.i("firebase", "Got location: $location")
-                        continuation.resume(location)
-                    } else {
-                        Log.e("firebase", "Latitude or longitude is null")
-                        continuation.resume(null)
-                    }
+    fun getLocationNurse(nurseID: String, callback: (LatLng?) -> Unit) {
+        val nurseLocationRef = firebaseClient.db_rt.child(common.NURSE_LOCATION_REFERENCE)
+        nurseLocationRef.child(nurseID).get().addOnSuccessListener { dataSnapshot ->
+            val locationArray = dataSnapshot.child("l").children.toList()
+            if (locationArray.size >= 2) {
+                val latitude = locationArray[1].getValue(Double::class.java)
+                val longitude = locationArray[0].getValue(Double::class.java)
+                if (latitude != null && longitude != null) {
+                    val location = LatLng(latitude, longitude)
+                    Log.i("firebase", "Got location: $location")
+                    callback(location)
                 } else {
-                    Log.e("firebase", "Invalid location array")
-                    continuation.resume(null)
+                    Log.e("firebase", "Latitude or longitude is null")
+                    callback(null)
                 }
-            }.addOnFailureListener { exception ->
-                Log.e("firebase", "Error getting data", exception)
-                continuation.resumeWithException(exception)
+            } else {
+                Log.e("firebase", "Invalid location array")
+                callback(null)
             }
+        }.addOnFailureListener { exception ->
+            Log.e("firebase", "Error getting data", exception)
+            callback(null)
         }
     }
 
@@ -196,5 +192,23 @@ class DatabaseService @Inject constructor(private val firebaseClient: FirebaseCl
                 callback(null, task.exception)
             }
         }
+    }
+
+    fun getState(): Boolean {
+        val patientID = firebaseClient.auth.currentUser!!.uid
+        val patientInfoRef = firebaseClient.db_rt.child(common.PATIENT_INFO_REFERENCE)
+        val statePatient = patientInfoRef.child(patientID).child("state")
+
+        statePatient.get().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val result = task.result
+                val stateBD: Boolean = result?.getValue(Boolean::class.java) ?: false
+                stateUser = stateBD
+            } else {
+                Log.d("STATE", "NO OBTENIDO")
+            }
+        }
+
+        return stateUser
     }
 }

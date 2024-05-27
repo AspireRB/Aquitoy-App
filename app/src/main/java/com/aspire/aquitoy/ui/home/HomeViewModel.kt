@@ -26,35 +26,30 @@ class HomeViewModel @Inject constructor(private val databaseService: DatabaseSer
 val firebaseClient: FirebaseClient, private val serviceInfo: ServiceInfo, private val context: Context) :
     ViewModel() {
 
-    private val _serviceInfoLiveData = MutableLiveData<ServiceInfoModel>()
-    val serviceInfoLiveData: LiveData<ServiceInfoModel> = _serviceInfoLiveData
+    private val _serviceInfoListLiveData = MutableLiveData<List<ServiceInfoModel>>()
+    val serviceInfoListLiveData: LiveData<List<ServiceInfoModel>> = _serviceInfoListLiveData
 
-    suspend fun getLocationNurse(nurseID: String): LatLng? {
-        val nurseLocation = databaseService.getLocationNurse(nurseID)
-        return nurseLocation
-    }
-
-    fun createToken() {
-        val result = databaseService.insertToken()
-        if (result.isComplete){
-            Log.d("Token", "Agregado")
-        } else {
-            Log.d("Token", "Fallo")
+    fun getLocationNurse(nurseID: String, callback: (LatLng?) -> Unit) {
+        databaseService.getLocationNurse(nurseID) { location ->
+            if (location != null) {
+                Log.i("HomeViewModel", "Nurse location: $location")
+                callback(location)
+            } else {
+                Log.e("HomeViewModel", "Failed to get nurse location")
+                callback(null)
+            }
         }
     }
 
-    fun initialService(nurseID: String, nurseLocationService: LatLng?, coordinates: LatLng) {
+    fun initialService(nurseID: String, coordinates: LatLng) {
         val serviceId = generateUniqueServiceId()
         val idPatient = firebaseClient.auth.currentUser?.uid.toString()
 
-        val nurseLatitude = nurseLocationService?.latitude ?: 0.0
-        val nurseLongitude = nurseLocationService?.longitude ?: 0.0
         val patientLatitude = coordinates.latitude
         val patientLongitude = coordinates.longitude
 
         val updatedServiceInfo = serviceInfo.copy(
             nurseID = nurseID,
-            nurseLocationService = "$nurseLatitude,$nurseLongitude",
             patientID = idPatient,
             patientLocationService = "$patientLatitude,$patientLongitude"
         )
@@ -78,74 +73,33 @@ val firebaseClient: FirebaseClient, private val serviceInfo: ServiceInfo, privat
         serviceReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    // Print the data structure for debugging
                     Log.d("Service", "DataSnapshot: ${dataSnapshot.value}")
 
-                    var serviceFound = false // Flag to track if a "create" service is found
+                    val serviceList = mutableListOf<ServiceInfoModel>()
+
                     for (snapshot in dataSnapshot.children) {
-                        // Access service data based on actual data structure
-                        val service = snapshot.getValue<Map<String, String>>() // Assuming the service data is a map
+                        val service = snapshot.getValue<Map<String, String>>()
+                        val serviceID = snapshot.key
+                        val nurseID = service?.get("nurseID") ?: ""
+                        val patientID = service?.get("patientID") ?: ""
+                        val patientLocationService = service?.get("patientLocationService") ?: ""
+                        val state = service?.get("state") ?: ""
 
-                        if (service != null && service["state"] == "accept") {
-                            val serviceID = snapshot.key
-                            val nurseID = service["nurseID"] ?: ""
-                            val nurseLocationService = service["nurseLocationService"] ?: ""
-                            val patientID = service["patientID"] ?: ""
-                            val patientLocationService = service["patientLocationService"] ?: ""
-                            val state = service["state"] ?: ""
-
+                        if (service != null) {
                             val serviceInfoModel = ServiceInfoModel(
                                 serviceID = serviceID,
                                 nurseID = nurseID,
-                                nurseLocationService = nurseLocationService,
                                 patientID = patientID,
                                 patientLocationService = patientLocationService,
                                 state = state
                             )
-                            _serviceInfoLiveData.value = serviceInfoModel
-                            serviceFound = true
-                            break
-                        } else if (service != null && service["state"] == "decline") {
-                            val serviceID = snapshot.key
-                            val nurseID = service["nurseID"] ?: ""
-                            val nurseLocationService = service["nurseLocationService"] ?: ""
-                            val patientID = service["patientID"] ?: ""
-                            val patientLocationService = service["patientLocationService"] ?: ""
-                            val state = service["state"] ?: ""
-
-                            val serviceInfoModel = ServiceInfoModel(
-                                serviceID = serviceID,
-                                nurseID = nurseID,
-                                nurseLocationService = nurseLocationService,
-                                patientID = patientID,
-                                patientLocationService = patientLocationService,
-                                state = state
-                            )
-                            _serviceInfoLiveData.value = serviceInfoModel
-                            serviceFound = true
-                            break
-                        } else if (service != null && service["state"] == "finalized") {
-                            val serviceID = snapshot.key
-                            val nurseID = service["nurseID"] ?: ""
-                            val nurseLocationService = service["nurseLocationService"] ?: ""
-                            val patientID = service["patientID"] ?: ""
-                            val patientLocationService = service["patientLocationService"] ?: ""
-                            val state = service["state"] ?: ""
-
-                            val serviceInfoModel = ServiceInfoModel(
-                                serviceID = serviceID,
-                                nurseID = nurseID,
-                                nurseLocationService = nurseLocationService,
-                                patientID = patientID,
-                                patientLocationService = patientLocationService,
-                                state = state
-                            )
-                            _serviceInfoLiveData.value = serviceInfoModel
-                            serviceFound = true
-                            break
+                            serviceList.add(serviceInfoModel)
                         }
                     }
-                    if (!serviceFound) {
+
+                    if (serviceList.isNotEmpty()) {
+                        _serviceInfoListLiveData.value = serviceList
+                    } else {
                         Log.d("Service", "No service found")
                     }
                 } else {
@@ -188,5 +142,13 @@ val firebaseClient: FirebaseClient, private val serviceInfo: ServiceInfo, privat
                 Log.d("STATE", "FALLO ACTUALIZAR STATE")
             }
         }
+    }
+
+    fun getState(): Boolean = runBlocking {
+        val statePatientDeferred = async { databaseService.getState() }
+        val statePatient = statePatientDeferred.await()
+
+        Log.d("STATE", "${statePatient}")
+        return@runBlocking statePatient
     }
 }
