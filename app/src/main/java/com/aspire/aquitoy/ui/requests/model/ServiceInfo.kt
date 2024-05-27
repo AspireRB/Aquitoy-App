@@ -8,7 +8,7 @@ import kotlinx.parcelize.Parcelize
 data class ServiceInfo(
     var serviceID: String = "", // Agrega la propiedad serviceID
     val nurseID: String = "",
-    val nurseLocationService: String = "",
+    val sendHistory: String = "",
     val patientID: String = "",
     val patientLocationService: String = "",
     var state: String = "",
@@ -32,7 +32,7 @@ data class ServiceInfo(
     fun toMap(): Map<String, Any?> {
         return mapOf(
             "nurseID" to nurseID,
-            "nurseLocationService" to nurseLocationService,
+            "sendHistory" to sendHistory,
             "patientID" to patientID,
             "patientLocationService" to patientLocationService,
             "state" to state,

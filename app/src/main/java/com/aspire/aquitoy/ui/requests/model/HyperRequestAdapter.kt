@@ -1,7 +1,7 @@
 package com.aspire.aquitoy.ui.requests.model
 
-import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
@@ -31,7 +31,12 @@ class HyperRequestAdapter(private val hyperServiceList: LiveData<List<ServiceInf
 
     override fun onBindViewHolder(holder: HyperRequestViewHolder, position: Int) {
         val item = items[position]
-        Log.d("ITEM", "${items[position]}")
         holder.render(item)
+        // Verificar el valor de sendHistory y establecer la visibilidad del elemento en consecuencia
+        if (item.sendHistory == "OK") {
+            holder.itemView.visibility = View.VISIBLE
+        } else {
+            holder.itemView.visibility = View.GONE
+        }
     }
 }
