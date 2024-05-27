@@ -82,11 +82,33 @@ class AuthenticationService @Inject constructor(private val firebase: FirebaseCl
 
     private suspend fun completeRegisterWithCredential(credential: AuthCredential): FirebaseUser? {
         return suspendCancellableCoroutine { cancellableContinuation ->
-            firebase.auth.signInWithCredential(credential).addOnSuccessListener {
-                cancellableContinuation.resume(it.user)
+            firebase.auth.signInWithCredential(credential).addOnSuccessListener { authResult ->
+                val firebaseUser = authResult.user
+                // Guardar el nombre y correo electrónico en la base de datos
+                saveGoogleUserDataToDatabase(firebaseUser)
+                cancellableContinuation.resume(firebaseUser)
             }.addOnFailureListener {
                 cancellableContinuation.resumeWithException(it)
             }
+        }
+    }
+
+    private fun saveGoogleUserDataToDatabase(user: FirebaseUser?) {
+        user?.let { firebaseUser ->
+            val uid = firebaseUser.uid
+            val name = firebaseUser.displayName
+            val email = firebaseUser.email
+            val rol = "patient"
+            val state = true
+            // Guardar el nombre y correo electrónico en la base de datos, por ejemplo:
+            val userRef = firebase.db_rt.child(common.PATIENT_INFO_REFERENCE).child(uid)
+            val userMap = HashMap<String, Any>()
+            userMap["email"] = email ?: ""
+            userMap["realName"] = name ?: ""
+            userMap["rol"] = rol
+            userMap["state"] = state
+
+            userRef.updateChildren(userMap)
         }
     }
 

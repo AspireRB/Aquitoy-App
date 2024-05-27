@@ -20,6 +20,8 @@ class ProfileViewModel @Inject constructor(private val authenticationService:
 
     fun logout(navigateToIntroduction: () -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
+            val googleSignInClient = authenticationService.getGoogleClient()
+            googleSignInClient.signOut()
             authenticationService.logout()
         }
         navigateToIntroduction()
