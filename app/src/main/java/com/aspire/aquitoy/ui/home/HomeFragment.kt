@@ -192,7 +192,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
                 }
 
                 override fun onPermissionDenied(p0: PermissionDeniedResponse?) {
-                    Snackbar.make(requireView(),p0!!.permissionName+" Permiso necesario",
+                    Snackbar.make(requireView(),"Permiso de ubicación necesario",
                         Snackbar.LENGTH_LONG).show()
                 }
 
@@ -364,7 +364,9 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
                                     distance++
                                     loadAvailableNurse()
                                 } else {
+                                    Log.d("DISTANCE", "${distance}")
                                     distance = 0.0
+                                    Log.d("DISTANCE2", "${distance}")
                                     if (_binding != null) {
                                         addNurseMarker()
                                     } else {
@@ -466,9 +468,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
             // Configurar el listener del marcador solo si map está inicializado
             map.setOnMarkerClickListener { marker ->
                 val nurseID = marker.title
-                var checkState = homeViewModel.checkState(nurseID!!)
                 if (nurseID != null) {
-                    checkState = homeViewModel.checkState(nurseID!!)
+                    val checkState = homeViewModel.checkState(nurseID!!)
                     if (checkState == true) {
                         _binding!!.btnService.visibility = View.VISIBLE
                         lifecycleScope.launch {
@@ -497,7 +498,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
         homeViewModel.getService()
         homeViewModel.serviceInfoListLiveData.observe(viewLifecycleOwner) { serviceInfoList ->
             serviceInfoList.forEach { serviceInfoModel ->
-                Log.d("SERVICE","${serviceInfoModel.copy()}")
                 homeViewModel.getLocationNurse(serviceInfoModel.nurseID!!) { nurseLocationService ->
                     if (serviceInfoModel.state == "accept") {
                         _isLoading.value = false
@@ -505,8 +505,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
                         serviceId = serviceInfoModel.serviceID!!
                         fusedLocationProviderClient.removeLocationUpdates(locationCallback)
                         start = "${coordinates.longitude}, ${coordinates.latitude}"
-                        end = "${nurseLocationService!!.longitude}, ${nurseLocationService!!
-                            .latitude}"
+                        end = "${nurseLocationService!!.longitude}, ${nurseLocationService!!.latitude}"
                         map.clear()
                         poly?.remove()
                         if (poly != null) {
