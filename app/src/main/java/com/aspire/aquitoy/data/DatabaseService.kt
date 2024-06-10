@@ -19,8 +19,8 @@ import javax.inject.Singleton
 class DatabaseService @Inject constructor(private val firebaseClient: FirebaseClient,
                                           @ApplicationContext private val context: Context) {
 
-    private var state = true
-    private var stateUser = false
+    private var state = ""
+    private var stateUser = ""
 
     fun getLocationNurse(nurseID: String, callback: (LatLng?) -> Unit) {
         val nurseLocationRef = firebaseClient.db_rt.child(common.NURSE_LOCATION_REFERENCE)
@@ -90,10 +90,18 @@ class DatabaseService @Inject constructor(private val firebaseClient: FirebaseCl
         return query
     }
 
-    fun updateState(asset : Boolean): Task<Void> {
+    fun updateState(asset : String): Task<Void> {
         val patientID = firebaseClient.auth.currentUser!!.uid
         val patientInfoRef = firebaseClient.db_rt.child(common.PATIENT_INFO_REFERENCE)
         return patientInfoRef.child(patientID).child("state").setValue(asset).addOnFailureListener {
+                exception ->
+            Log.d("REALTIMEDATABASE", "ERROR: ${exception.message}")
+        }
+    }
+
+    fun updateStateNurse(asset: String, nurseID: String): Task<Void> {
+        val nurseInfoRef = firebaseClient.db_rt.child(common.NURSE_INFO_REFERENCES)
+        return nurseInfoRef.child(nurseID).child("state").setValue(asset).addOnFailureListener {
                 exception ->
             Log.d("REALTIMEDATABASE", "ERROR: ${exception.message}")
         }
@@ -106,14 +114,14 @@ class DatabaseService @Inject constructor(private val firebaseClient: FirebaseCl
         return query
     }
 
-    fun checkStateNurse(nurseID: String): Boolean {
+    fun checkStateNurse(nurseID: String): String {
         val nurseInfoRef = firebaseClient.db_rt.child(common.NURSE_INFO_REFERENCES)
         val stateNurse = nurseInfoRef.child(nurseID).child("state")
 
         stateNurse.get().addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 val result = task.result
-                val stateBD: Boolean = result?.getValue(Boolean::class.java) ?: false
+                val stateBD = result.getValue().toString()
                 state = stateBD
             } else {
                 Log.d("STATE", "NO OBTENIDO")
@@ -123,7 +131,7 @@ class DatabaseService @Inject constructor(private val firebaseClient: FirebaseCl
         return state
     }
 
-    fun checkStatePatient(): Boolean {
+    fun checkStatePatient(): String {
         val patientID = firebaseClient.auth.currentUser!!.uid
         val patientInfoRef = firebaseClient.db_rt.child(common.PATIENT_INFO_REFERENCE)
         val statePatient = patientInfoRef.child(patientID).child("state")
@@ -131,7 +139,7 @@ class DatabaseService @Inject constructor(private val firebaseClient: FirebaseCl
         statePatient.get().addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 val result = task.result
-                val stateBD: Boolean = result?.getValue(Boolean::class.java) ?: false
+                val stateBD = result.getValue().toString()
                 state = stateBD
             } else {
                 Log.d("STATE", "NO OBTENIDO")
@@ -194,7 +202,7 @@ class DatabaseService @Inject constructor(private val firebaseClient: FirebaseCl
         }
     }
 
-    fun getState(): Boolean {
+    fun getState(): String {
         val patientID = firebaseClient.auth.currentUser!!.uid
         val patientInfoRef = firebaseClient.db_rt.child(common.PATIENT_INFO_REFERENCE)
         val statePatient = patientInfoRef.child(patientID).child("state")
@@ -202,7 +210,7 @@ class DatabaseService @Inject constructor(private val firebaseClient: FirebaseCl
         statePatient.get().addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 val result = task.result
-                val stateBD: Boolean = result?.getValue(Boolean::class.java) ?: false
+                val stateBD = result.getValue().toString()
                 stateUser = stateBD
             } else {
                 Log.d("STATE", "NO OBTENIDO")

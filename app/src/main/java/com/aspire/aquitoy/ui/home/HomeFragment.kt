@@ -151,7 +151,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
         }
     }
 
-
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap!!
         Dexter.withContext(requireContext())
@@ -364,9 +363,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
                                     distance++
                                     loadAvailableNurse()
                                 } else {
-                                    Log.d("DISTANCE", "${distance}")
                                     distance = 0.0
-                                    Log.d("DISTANCE2", "${distance}")
                                     if (_binding != null) {
                                         addNurseMarker()
                                     } else {
@@ -421,17 +418,10 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
     }
 
     private fun findNurseByKey(nurseGeoModel: NurseGeoModel?) {
-        if (nurseGeoModel == null || nurseGeoModel.key == null) {
-            Log.e("findNurseByKey", "NurseGeoModel or key is null")
-            return
-        }
-
-        Log.d("findNurseByKey", "Searching for nurse with key: ${nurseGeoModel.key}")
-
         FirebaseDatabase.getInstance()
             .getReference(common.NURSE_INFO_REFERENCES) // Asegúrate de que esta referencia sea
             // correcta
-            .child(nurseGeoModel.key!!)
+            .child(nurseGeoModel!!.key!!)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if (snapshot.exists()) {
@@ -456,7 +446,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
             })
     }
 
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -475,8 +464,9 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
                         lifecycleScope.launch {
                             _binding!!.btnService.setOnClickListener {
                                 homeViewModel.initialService(nurseID, coordinates)
+                                homeViewModel.updateState("NOK")
+                                homeViewModel.updateStateNurse("NOK", nurseID)
                                 _isLoading.value = true
-                                getService()
                                 Toast.makeText(context, "Esperando respuesta", Toast.LENGTH_SHORT).show()
                                 _binding!!.btnService.visibility = View.INVISIBLE
                             }
@@ -499,9 +489,21 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
         homeViewModel.serviceInfoListLiveData.observe(viewLifecycleOwner) { serviceInfoList ->
             serviceInfoList.forEach { serviceInfoModel ->
                 homeViewModel.getLocationNurse(serviceInfoModel.nurseID!!) { nurseLocationService ->
+                    if (serviceInfoModel.state == "create") {
+                        _isLoading.value = true
+                        stopLocationUpdates()
+                        map.clear()
+                        if (::map.isInitialized) {
+                            map.addMarker(MarkerOptions()
+                                .position(LatLng(nurseLocationService!!.latitude, nurseLocationService!!.longitude))
+                                .flat(true)
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_nurse)))
+                        }
+                        Toast.makeText(context, "Esperando respuesta", Toast.LENGTH_SHORT).show()
+                    }
+
                     if (serviceInfoModel.state == "accept") {
                         _isLoading.value = false
-                        homeViewModel.updateState(false)
                         serviceId = serviceInfoModel.serviceID!!
                         fusedLocationProviderClient.removeLocationUpdates(locationCallback)
                         start = "${coordinates.longitude}, ${coordinates.latitude}"
@@ -524,19 +526,20 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
 
                 if (serviceInfoModel.state == "decline") {
                     _isLoading.value = false
+                    homeViewModel.updateState("OK")
                     homeViewModel.deleteService(serviceInfoModel.serviceID)
+                    startLocationUpdates()
                 }
 
                 if (serviceId == serviceInfoModel.serviceID) {
                     if (serviceInfoModel.state == "finalized") {
                         val state = homeViewModel.getState()
                         if (state != true) {
-                            homeViewModel.updateState(true)
+                            homeViewModel.updateState("OK")
                             poly?.remove()
                             map.clear()
                             Toast.makeText(context, "Servicio finalizado", Toast.LENGTH_SHORT).show()
-                            init()
-                            loadAvailableNurse()
+                            startLocationUpdates()
                         }
                     }
                 }
@@ -579,21 +582,27 @@ class HomeFragment : Fragment(), OnMapReadyCallback, FirebaseNurseInfoListener {
     }
 
     override fun onNurseInfoLoadSuccess(nurseGeoModel: NurseGeoModel?) {
-        if (!common.markerList.containsKey(nurseGeoModel!!.key)) {
-            val marker = map.addMarker(MarkerOptions()
-                .position(LatLng(nurseGeoModel!!.geoLocation!!.latitude, nurseGeoModel!!
-                    .geoLocation!!.longitude))
-                .flat(true)
-                .title(nurseGeoModel.key)
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_nurse)))
-            if (marker != null) {  // Check if marker is not null
-                common.markerList.put(nurseGeoModel!!.key!!, marker)
+        val stateNurse = homeViewModel.checkStateNurse(nurseGeoModel!!.key!!)
+        if (stateNurse == true) {
+            if (!common.markerList.containsKey(nurseGeoModel!!.key)) {
+                val marker = map.addMarker(MarkerOptions()
+                    .position(LatLng(nurseGeoModel!!.geoLocation!!.latitude, nurseGeoModel!!
+                        .geoLocation!!.longitude))
+                    .flat(true)
+                    .title(nurseGeoModel.key)
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_nurse)))
+                if (marker != null) {  // Check if marker is not null
+                    common.markerList.put(nurseGeoModel!!.key!!, marker)
+                }
+            }
+        } else {
+            if(common.markerList.get(nurseGeoModel!!.key!!) != null){
+                val marker = common.markerList.get(nurseGeoModel!!.key!!)
+                marker!!.remove()
             }
         }
 
-        val nurseLocation = FirebaseDatabase.getInstance()
-            .getReference(common.NURSE_LOCATION_REFERENCE)
-            .child(nurseGeoModel!!.key!!)
+        val nurseLocation = FirebaseDatabase.getInstance().getReference(common.NURSE_LOCATION_REFERENCE).child(nurseGeoModel!!.key!!)
         nurseLocation.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if(!snapshot.exists()) {

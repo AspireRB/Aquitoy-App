@@ -130,12 +130,37 @@ val firebaseClient: FirebaseClient, private val serviceInfo: ServiceInfo, privat
         val stateNurse = stateNurseDeferred.await()
         val statePatient = statePatientDeferred.await()
 
-        Log.d("STATE", "${stateNurse && statePatient}")
-        return@runBlocking stateNurse && statePatient
+        if (statePatient == "OK" && stateNurse == "OK") {
+            return@runBlocking true
+        } else {
+            return@runBlocking false
+        }
     }
 
-    fun updateState(state: Boolean) {
+    fun checkStateNurse(nurseID: String): Boolean = runBlocking {
+        val stateNurseDeferred = async { databaseService.checkStateNurse(nurseID) }
+
+        val stateNurse = stateNurseDeferred.await()
+
+        if (stateNurse == "OK") {
+            return@runBlocking true
+        } else {
+            return@runBlocking false
+        }
+    }
+
+    fun updateState(state: String) {
         databaseService.updateState(state).addOnCompleteListener {
+            if (it.isSuccessful) {
+                Log.d("STATE", "ACTUALIZADO")
+            } else {
+                Log.d("STATE", "FALLO ACTUALIZAR STATE")
+            }
+        }
+    }
+
+    fun updateStateNurse(state: String, nurseID: String) {
+        databaseService.updateStateNurse(state, nurseID).addOnCompleteListener {
             if (it.isSuccessful) {
                 Log.d("STATE", "ACTUALIZADO")
             } else {
@@ -148,7 +173,10 @@ val firebaseClient: FirebaseClient, private val serviceInfo: ServiceInfo, privat
         val statePatientDeferred = async { databaseService.getState() }
         val statePatient = statePatientDeferred.await()
 
-        Log.d("STATE", "${statePatient}")
-        return@runBlocking statePatient
+        if (statePatient == "OK") {
+            return@runBlocking true
+        } else {
+            return@runBlocking false
+        }
     }
 }

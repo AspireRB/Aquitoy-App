@@ -4,5 +4,5 @@ data class UserSetInfo(
     val realName: String,
     val email: String,
     val rol: String = "patient",
-    val state: Boolean = true
+    val state: String = "OK"
 )
